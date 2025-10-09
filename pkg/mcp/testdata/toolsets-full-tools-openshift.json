@@ -600,5 +600,53 @@
       }
     },
     "name": "validations_list"
+  },
+  {
+    "annotations": {
+      "title": "Workload: Details",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    },
+    "description": "Get detailed information for a specific workload in a namespace, including validation, health status, and configuration",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "description": "Namespace containing the workload",
+          "type": "string"
+        },
+        "workload": {
+          "description": "Name of the workload to get details for",
+          "type": "string"
+        }
+      },
+      "required": [
+        "namespace",
+        "workload"
+      ]
+    },
+    "name": "workload_details"
+  },
+  {
+    "annotations": {
+      "title": "Workloads: List",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    },
+    "description": "Get all workloads in the mesh across specified namespaces with health and Istio resource information",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespaces": {
+          "description": "Comma-separated list of namespaces to get workloads from (e.g. 'bookinfo' or 'bookinfo,default'). If not provided, will list workloads from all accessible namespaces",
+          "type": "string"
+        }
+      }
+    },
+    "name": "workloads_list"
   }
 ]

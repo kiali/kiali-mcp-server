@@ -168,6 +168,38 @@ func (k *Kiali) MeshNamespaces(ctx context.Context, authHeader string) (string, 
 	return k.executeRequest(ctx, authHeader, endpoint)
 }
 
+// WorkloadsList returns the list of workloads across specified namespaces.
+func (k *Kiali) WorkloadsList(ctx context.Context, authHeader string, namespaces string) (string, error) {
+	baseURL, err := k.validateAndGetBaseURL()
+	if err != nil {
+		return "", err
+	}
+	endpoint := strings.TrimRight(baseURL, "/") + "/api/clusters/workloads?health=true&istioResources=true&rateInterval=60s"
+	if namespaces != "" {
+		endpoint += "&namespaces=" + url.QueryEscape(namespaces)
+	}
+
+	return k.executeRequest(ctx, authHeader, endpoint)
+}
+
+// WorkloadDetails returns the details for a specific workload in a namespace.
+func (k *Kiali) WorkloadDetails(ctx context.Context, authHeader string, namespace string, workload string) (string, error) {
+	baseURL, err := k.validateAndGetBaseURL()
+	if err != nil {
+		return "", err
+	}
+	if namespace == "" {
+		return "", fmt.Errorf("namespace is required")
+	}
+	if workload == "" {
+		return "", fmt.Errorf("workload name is required")
+	}
+	endpoint := fmt.Sprintf("%s/api/namespaces/%s/workloads/%s?validate=true&rateInterval=60s&health=true",
+		strings.TrimRight(baseURL, "/"), url.PathEscape(namespace), url.PathEscape(workload))
+
+	return k.executeRequest(ctx, authHeader, endpoint)
+}
+
 func (m *Manager) Derived(ctx context.Context) (*Kiali, error) {
 	authorization, ok := ctx.Value(internalk8s.OAuthAuthorizationHeader).(string)
 	if !ok || !strings.HasPrefix(authorization, "Bearer ") {
