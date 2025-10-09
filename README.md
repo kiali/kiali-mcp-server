@@ -251,11 +251,18 @@ The following sets of tools are available (only Kiali by default):
   - `namespace` (`string`) - Optional single namespace to include in the graph (alternative to namespaces)
   - `namespaces` (`string`) - Optional comma-separated list of namespaces to include in the graph
 
-- **namespaces** - Get all namespaces in the mesh that the user has access to
-
 - **validations_list** - List all the validations in the current cluster from all namespaces
   - `namespace` (`string`) - Optional single namespace to retrieve validations from (alternative to namespaces)
   - `namespaces` (`string`) - Optional comma-separated list of namespaces to retrieve validations from
+
+- **namespaces** - Get all namespaces in the mesh that the user has access to
+
+- **workloads_list** - Get all workloads in the mesh across specified namespaces with health and Istio resource information
+  - `namespaces` (`string`) - Comma-separated list of namespaces to get workloads from (e.g. 'bookinfo' or 'bookinfo,default'). If not provided, will list workloads from all accessible namespaces
+
+- **workload_details** - Get detailed information for a specific workload in a namespace, including validation, health status, and configuration
+  - `namespace` (`string`) **(required)** - Namespace containing the workload
+  - `workload` (`string`) **(required)** - Name of the workload to get details for
 
 </details>
 
