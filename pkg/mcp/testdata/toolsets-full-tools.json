@@ -565,6 +565,54 @@
   },
   {
     "annotations": {
+      "title": "Service: Details",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    },
+    "description": "Get detailed information for a specific service in a namespace, including validation, health status, and configuration",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "description": "Namespace containing the service",
+          "type": "string"
+        },
+        "service": {
+          "description": "Name of the service to get details for",
+          "type": "string"
+        }
+      },
+      "required": [
+        "namespace",
+        "service"
+      ]
+    },
+    "name": "service_details"
+  },
+  {
+    "annotations": {
+      "title": "Services: List",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    },
+    "description": "Get all services in the mesh across specified namespaces with health and Istio resource information",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespaces": {
+          "description": "Comma-separated list of namespaces to get services from (e.g. 'bookinfo' or 'bookinfo,default'). If not provided, will list services from all accessible namespaces",
+          "type": "string"
+        }
+      }
+    },
+    "name": "services_list"
+  },
+  {
+    "annotations": {
       "title": "Validations: List",
       "readOnlyHint": true,
       "destructiveHint": false,

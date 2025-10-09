@@ -257,6 +257,13 @@ The following sets of tools are available (only Kiali by default):
 
 - **namespaces** - Get all namespaces in the mesh that the user has access to
 
+- **services_list** - Get all services in the mesh across specified namespaces with health and Istio resource information
+  - `namespaces` (`string`) - Comma-separated list of namespaces to get services from (e.g. 'bookinfo' or 'bookinfo,default'). If not provided, will list services from all accessible namespaces
+
+- **service_details** - Get detailed information for a specific service in a namespace, including validation, health status, and configuration
+  - `namespace` (`string`) **(required)** - Namespace containing the service
+  - `service` (`string`) **(required)** - Name of the service to get details for
+
 - **workloads_list** - Get all workloads in the mesh across specified namespaces with health and Istio resource information
   - `namespaces` (`string`) - Comma-separated list of namespaces to get workloads from (e.g. 'bookinfo' or 'bookinfo,default'). If not provided, will list workloads from all accessible namespaces
 
