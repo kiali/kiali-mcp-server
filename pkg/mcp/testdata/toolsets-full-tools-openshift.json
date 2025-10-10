@@ -165,6 +165,63 @@
   },
   {
     "annotations": {
+      "title": "Istio Config: List All",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    },
+    "description": "Get all Istio configuration objects in the mesh including their full YAML resources and details",
+    "inputSchema": {
+      "type": "object"
+    },
+    "name": "istio_config"
+  },
+  {
+    "annotations": {
+      "title": "Istio Object: Details",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    },
+    "description": "Get detailed information about a specific Istio object including validation and help information",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "description": "API group of the Istio object (e.g., 'networking.istio.io', 'gateway.networking.k8s.io')",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind of the Istio object (e.g., 'DestinationRule', 'VirtualService', 'HTTPRoute', 'Gateway')",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the Istio object",
+          "type": "string"
+        },
+        "namespace": {
+          "description": "Namespace containing the Istio object",
+          "type": "string"
+        },
+        "version": {
+          "description": "API version of the Istio object (e.g., 'v1', 'v1beta1')",
+          "type": "string"
+        }
+      },
+      "required": [
+        "namespace",
+        "group",
+        "version",
+        "kind",
+        "name"
+      ]
+    },
+    "name": "istio_object_details"
+  },
+  {
+    "annotations": {
       "title": "Namespaces: List",
       "readOnlyHint": true,
       "destructiveHint": false,

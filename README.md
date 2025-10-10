@@ -273,6 +273,15 @@ The following sets of tools are available (only Kiali by default):
   - `namespace` (`string`) **(required)** - Namespace containing the workload
   - `workload` (`string`) **(required)** - Name of the workload to get details for
 
+- **istio_config** - Get all Istio configuration objects in the mesh including their full YAML resources and details
+
+- **istio_object_details** - Get detailed information about a specific Istio object including validation and help information
+  - `group` (`string`) **(required)** - API group of the Istio object (e.g., 'networking.istio.io', 'gateway.networking.k8s.io')
+  - `kind` (`string`) **(required)** - Kind of the Istio object (e.g., 'DestinationRule', 'VirtualService', 'HTTPRoute', 'Gateway')
+  - `name` (`string`) **(required)** - Name of the Istio object
+  - `namespace` (`string`) **(required)** - Namespace containing the Istio object
+  - `version` (`string`) **(required)** - API version of the Istio object (e.g., 'v1', 'v1beta1')
+
 </details>
 
 
