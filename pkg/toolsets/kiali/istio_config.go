@@ -32,7 +32,6 @@ func initIstioConfig() []api.ServerTool {
 			},
 		}, Handler: istioConfigHandler,
 	})
-	fmt.Printf("DEBUG: initIstioConfig() returning %d tools\n", len(ret))
 	return ret
 }
 
