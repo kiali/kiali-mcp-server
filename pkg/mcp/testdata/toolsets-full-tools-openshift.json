@@ -202,6 +202,43 @@
   },
   {
     "annotations": {
+      "title": "Istio Object: Delete",
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true,
+      "openWorldHint": false
+    },
+    "description": "Delete an existing Istio object using DELETE method.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "description": "Namespace containing the Istio object",
+          "type": "string"
+        },
+        "group": {
+          "description": "API group of the Istio object (e.g., 'networking.istio.io', 'gateway.networking.k8s.io')",
+          "type": "string"
+        },
+        "version": {
+          "description": "API version of the Istio object (e.g., 'v1', 'v1beta1')",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind of the Istio object (e.g., 'DestinationRule', 'VirtualService', 'HTTPRoute', 'Gateway')",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the Istio object",
+          "type": "string"
+        }
+      },
+      "required": ["namespace", "group", "version", "kind", "name"]
+    },
+    "name": "istio_object_delete"
+  },
+  {
+    "annotations": {
       "title": "Istio Object: Details",
       "readOnlyHint": true,
       "destructiveHint": false,

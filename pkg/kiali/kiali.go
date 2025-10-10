@@ -416,6 +416,44 @@ func (k *Kiali) IstioObjectCreate(ctx context.Context, authHeader string, namesp
 	return k.executeRequestWithBody(ctx, authHeader, http.MethodPost, endpoint, "application/json", strings.NewReader(jsonData))
 }
 
+// IstioObjectDelete deletes an existing Istio object using DELETE method.
+// Parameters:
+//   - namespace: the namespace containing the Istio object
+//   - group: the API group (e.g., "networking.istio.io", "gateway.networking.k8s.io")
+//   - version: the API version (e.g., "v1", "v1beta1")
+//   - kind: the resource kind (e.g., "DestinationRule", "VirtualService", "HTTPRoute", "Gateway")
+//   - name: the name of the resource
+func (k *Kiali) IstioObjectDelete(ctx context.Context, authHeader string, namespace, group, version, kind, name string) (string, error) {
+	baseURL, err := k.validateAndGetBaseURL()
+	if err != nil {
+		return "", err
+	}
+	if namespace == "" {
+		return "", fmt.Errorf("namespace is required")
+	}
+	if group == "" {
+		return "", fmt.Errorf("group is required")
+	}
+	if version == "" {
+		return "", fmt.Errorf("version is required")
+	}
+	if kind == "" {
+		return "", fmt.Errorf("kind is required")
+	}
+	if name == "" {
+		return "", fmt.Errorf("name is required")
+	}
+	endpoint := fmt.Sprintf("%s/api/namespaces/%s/istio/%s/%s/%s/%s",
+		strings.TrimRight(baseURL, "/"),
+		url.PathEscape(namespace),
+		url.PathEscape(group),
+		url.PathEscape(version),
+		url.PathEscape(kind),
+		url.PathEscape(name))
+
+	return k.executeRequestWithBody(ctx, authHeader, http.MethodDelete, endpoint, "", nil)
+}
+
 func (m *Manager) Derived(ctx context.Context) (*Kiali, error) {
 	authorization, ok := ctx.Value(internalk8s.OAuthAuthorizationHeader).(string)
 	if !ok || !strings.HasPrefix(authorization, "Bearer ") {
