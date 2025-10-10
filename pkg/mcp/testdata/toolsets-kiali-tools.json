@@ -25,6 +25,141 @@
   },
   {
     "annotations": {
+      "title": "Istio Config: List All",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    },
+    "description": "Get all Istio configuration objects in the mesh including their full YAML resources and details",
+    "inputSchema": {
+      "type": "object"
+    },
+    "name": "istio_config"
+  },
+  {
+    "annotations": {
+      "title": "Istio Object: Create",
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "description": "Create a new Istio object using POST method. The JSON data will be used to create the new object.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "description": "Namespace where the Istio object will be created",
+          "type": "string"
+        },
+        "group": {
+          "description": "API group of the Istio object (e.g., 'networking.istio.io', 'gateway.networking.k8s.io')",
+          "type": "string"
+        },
+        "version": {
+          "description": "API version of the Istio object (e.g., 'v1', 'v1beta1')",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind of the Istio object (e.g., 'DestinationRule', 'VirtualService', 'HTTPRoute', 'Gateway')",
+          "type": "string"
+        },
+        "json_data": {
+          "description": "JSON data for the new object",
+          "type": "string"
+        }
+      },
+      "required": ["namespace", "group", "version", "kind", "json_data"]
+    },
+    "name": "istio_object_create"
+  },
+  {
+    "annotations": {
+      "title": "Istio Object: Details",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    },
+    "description": "Get detailed information about a specific Istio object including validation and help information",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "description": "API group of the Istio object (e.g., 'networking.istio.io', 'gateway.networking.k8s.io')",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind of the Istio object (e.g., 'DestinationRule', 'VirtualService', 'HTTPRoute', 'Gateway')",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the Istio object",
+          "type": "string"
+        },
+        "namespace": {
+          "description": "Namespace containing the Istio object",
+          "type": "string"
+        },
+        "version": {
+          "description": "API version of the Istio object (e.g., 'v1', 'v1beta1')",
+          "type": "string"
+        }
+      },
+      "required": [
+        "namespace",
+        "group",
+        "version",
+        "kind",
+        "name"
+      ]
+    },
+    "name": "istio_object_details"
+  },
+  {
+    "annotations": {
+      "title": "Istio Object: Patch",
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": false,
+      "openWorldHint": false
+    },
+    "description": "Modify an existing Istio object using PATCH method. The JSON patch data will be applied to the existing object.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespace": {
+          "description": "Namespace containing the Istio object",
+          "type": "string"
+        },
+        "group": {
+          "description": "API group of the Istio object (e.g., 'networking.istio.io', 'gateway.networking.k8s.io')",
+          "type": "string"
+        },
+        "version": {
+          "description": "API version of the Istio object (e.g., 'v1', 'v1beta1')",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind of the Istio object (e.g., 'DestinationRule', 'VirtualService', 'HTTPRoute', 'Gateway')",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the Istio object",
+          "type": "string"
+        },
+        "json_patch": {
+          "description": "JSON patch data to apply to the object",
+          "type": "string"
+        }
+      },
+      "required": ["namespace", "group", "version", "kind", "name", "json_patch"]
+    },
+    "name": "istio_object_patch"
+  },
+  {
+    "annotations": {
       "title": "Mesh Status: Components Overview",
       "readOnlyHint": true,
       "destructiveHint": false,

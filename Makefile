@@ -26,6 +26,7 @@ ARCHS = amd64 arm64
 
 CLEAN_TARGETS :=
 CLEAN_TARGETS += '$(BINARY_NAME)'
+CLEAN_TARGETS += '$(CLIENT_BINARY_NAME)'
 CLEAN_TARGETS += $(foreach os,$(OSES),$(foreach arch,$(ARCHS),$(BINARY_NAME)-$(os)-$(arch)$(if $(findstring windows,$(os)),.exe,)))
 CLEAN_TARGETS += $(foreach os,$(OSES),$(foreach arch,$(ARCHS),./npm/$(BINARY_NAME)-$(os)-$(arch)/bin/))
 CLEAN_TARGETS += ./npm/kiali-mcp-server/.npmrc ./npm/kiali-mcp-server/LICENSE ./npm/kiali-mcp-server/README.md
