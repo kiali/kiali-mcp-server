@@ -251,6 +251,8 @@ The following sets of tools are available (only Kiali by default):
   - `namespace` (`string`) - Optional single namespace to include in the graph (alternative to namespaces)
   - `namespaces` (`string`) - Optional comma-separated list of namespaces to include in the graph
 
+- **mesh_status** - Get the status of mesh components including Istio, Kiali, Grafana, Prometheus and their interactions, versions, and health status
+
 - **validations_list** - List all the validations in the current cluster from all namespaces
   - `namespace` (`string`) - Optional single namespace to retrieve validations from (alternative to namespaces)
   - `namespaces` (`string`) - Optional comma-separated list of namespaces to retrieve validations from

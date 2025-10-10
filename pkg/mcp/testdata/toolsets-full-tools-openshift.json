@@ -151,6 +151,20 @@
   },
   {
     "annotations": {
+      "title": "Mesh Status: Components Overview",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    },
+    "description": "Get the status of mesh components including Istio, Kiali, Grafana, Prometheus and their interactions, versions, and health status",
+    "inputSchema": {
+      "type": "object"
+    },
+    "name": "mesh_status"
+  },
+  {
+    "annotations": {
       "title": "Namespaces: List",
       "readOnlyHint": true,
       "destructiveHint": false,
