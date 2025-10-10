@@ -23,6 +23,7 @@ func (t *Toolset) GetDescription() string {
 func (t *Toolset) GetTools(_ internalk8s.Openshift) []api.ServerTool {
 	return slices.Concat(
 		initGraph(),
+		initMeshStatus(),
 		initValidations(),
 		initNamespaces(),
 		initServices(),
