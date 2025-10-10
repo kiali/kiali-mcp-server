@@ -253,6 +253,30 @@ The following sets of tools are available (only Kiali by default):
 
 - **mesh_status** - Get the status of mesh components including Istio, Kiali, Grafana, Prometheus and their interactions, versions, and health status
 
+- **istio_config** - Get all Istio configuration objects in the mesh including their full YAML resources and details
+
+- **istio_object_details** - Get detailed information about a specific Istio object including validation and help information
+  - `group` (`string`) **(required)** - API group of the Istio object (e.g., 'networking.istio.io', 'gateway.networking.k8s.io')
+  - `kind` (`string`) **(required)** - Kind of the Istio object (e.g., 'DestinationRule', 'VirtualService', 'HTTPRoute', 'Gateway')
+  - `name` (`string`) **(required)** - Name of the Istio object
+  - `namespace` (`string`) **(required)** - Namespace containing the Istio object
+  - `version` (`string`) **(required)** - API version of the Istio object (e.g., 'v1', 'v1beta1')
+
+- **istio_object_patch** - Modify an existing Istio object using PATCH method. The JSON patch data will be applied to the existing object.
+  - `group` (`string`) **(required)** - API group of the Istio object (e.g., 'networking.istio.io', 'gateway.networking.k8s.io')
+  - `json_patch` (`string`) **(required)** - JSON patch data to apply to the object
+  - `kind` (`string`) **(required)** - Kind of the Istio object (e.g., 'DestinationRule', 'VirtualService', 'HTTPRoute', 'Gateway')
+  - `name` (`string`) **(required)** - Name of the Istio object
+  - `namespace` (`string`) **(required)** - Namespace containing the Istio object
+  - `version` (`string`) **(required)** - API version of the Istio object (e.g., 'v1', 'v1beta1')
+
+- **istio_object_create** - Create a new Istio object using POST method. The JSON data will be used to create the new object.
+  - `group` (`string`) **(required)** - API group of the Istio object (e.g., 'networking.istio.io', 'gateway.networking.k8s.io')
+  - `json_data` (`string`) **(required)** - JSON data for the new object
+  - `kind` (`string`) **(required)** - Kind of the Istio object (e.g., 'DestinationRule', 'VirtualService', 'HTTPRoute', 'Gateway')
+  - `namespace` (`string`) **(required)** - Namespace where the Istio object will be created
+  - `version` (`string`) **(required)** - API version of the Istio object (e.g., 'v1', 'v1beta1')
+
 - **validations_list** - List all the validations in the current cluster from all namespaces
   - `namespace` (`string`) - Optional single namespace to retrieve validations from (alternative to namespaces)
   - `namespaces` (`string`) - Optional comma-separated list of namespaces to retrieve validations from
@@ -272,15 +296,6 @@ The following sets of tools are available (only Kiali by default):
 - **workload_details** - Get detailed information for a specific workload in a namespace, including validation, health status, and configuration
   - `namespace` (`string`) **(required)** - Namespace containing the workload
   - `workload` (`string`) **(required)** - Name of the workload to get details for
-
-- **istio_config** - Get all Istio configuration objects in the mesh including their full YAML resources and details
-
-- **istio_object_details** - Get detailed information about a specific Istio object including validation and help information
-  - `group` (`string`) **(required)** - API group of the Istio object (e.g., 'networking.istio.io', 'gateway.networking.k8s.io')
-  - `kind` (`string`) **(required)** - Kind of the Istio object (e.g., 'DestinationRule', 'VirtualService', 'HTTPRoute', 'Gateway')
-  - `name` (`string`) **(required)** - Name of the Istio object
-  - `namespace` (`string`) **(required)** - Namespace containing the Istio object
-  - `version` (`string`) **(required)** - API version of the Istio object (e.g., 'v1', 'v1beta1')
 
 </details>
 

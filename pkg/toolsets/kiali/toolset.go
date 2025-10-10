@@ -24,12 +24,14 @@ func (t *Toolset) GetTools(_ internalk8s.Openshift) []api.ServerTool {
 	return slices.Concat(
 		initGraph(),
 		initMeshStatus(),
+		initIstioConfig(),
+		initIstioObjectDetails(),
+		initIstioObjectPatch(),
+		initIstioObjectCreate(),
 		initValidations(),
 		initNamespaces(),
 		initServices(),
 		initWorkloads(),
-		initIstioConfig(),
-		initIstioObjectDetails(),
 	)
 }
 
