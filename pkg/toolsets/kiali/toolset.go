@@ -28,6 +28,7 @@ func (t *Toolset) GetTools(_ internalk8s.Openshift) []api.ServerTool {
 		initIstioObjectDetails(),
 		initIstioObjectPatch(),
 		initIstioObjectCreate(),
+		initIstioObjectDelete(),
 		initValidations(),
 		initNamespaces(),
 		initServices(),
