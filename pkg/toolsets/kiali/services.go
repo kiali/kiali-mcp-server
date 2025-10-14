@@ -68,6 +68,67 @@ func initServices() []api.ServerTool {
 		}, Handler: serviceDetailsHandler,
 	})
 
+	// Service metrics tool
+	ret = append(ret, api.ServerTool{
+		Tool: api.Tool{
+			Name:        "service_metrics",
+			Description: "Get metrics for a specific service in a namespace. Supports filtering by time range, direction (inbound/outbound), reporter, and other query parameters",
+			InputSchema: &jsonschema.Schema{
+				Type: "object",
+				Properties: map[string]*jsonschema.Schema{
+					"namespace": {
+						Type:        "string",
+						Description: "Namespace containing the service",
+					},
+					"service": {
+						Type:        "string",
+						Description: "Name of the service to get metrics for",
+					},
+					"duration": {
+						Type:        "string",
+						Description: "Duration of the query period in seconds (e.g., '1800' for 30 minutes). Optional, defaults to 1800 seconds",
+					},
+					"step": {
+						Type:        "string",
+						Description: "Step between data points in seconds (e.g., '15'). Optional, defaults to 15 seconds",
+					},
+					"rateInterval": {
+						Type:        "string",
+						Description: "Rate interval for metrics (e.g., '1m', '5m'). Optional, defaults to '1m'",
+					},
+					"direction": {
+						Type:        "string",
+						Description: "Traffic direction: 'inbound' or 'outbound'. Optional, defaults to 'outbound'",
+					},
+					"reporter": {
+						Type:        "string",
+						Description: "Metrics reporter: 'source', 'destination', or 'both'. Optional, defaults to 'source'",
+					},
+					"requestProtocol": {
+						Type:        "string",
+						Description: "Filter by request protocol (e.g., 'http', 'grpc', 'tcp'). Optional",
+					},
+					"quantiles": {
+						Type:        "string",
+						Description: "Comma-separated list of quantiles for histogram metrics (e.g., '0.5,0.95,0.99'). Optional",
+					},
+					"byLabels": {
+						Type:        "string",
+						Description: "Comma-separated list of labels to group metrics by (e.g., 'source_workload,destination_service'). Optional",
+					},
+				},
+				Required: []string{"namespace", "service"},
+			},
+			Annotations: api.ToolAnnotations{
+				Title:           "Service: Metrics",
+				ReadOnlyHint:    ptr.To(true),
+				DestructiveHint: ptr.To(false),
+				IdempotentHint:  ptr.To(true),
+				OpenWorldHint:   ptr.To(true),
+			},
+		}, Handler: serviceMetricsHandler,
+	})
+
 	return ret
 }
 
@@ -121,6 +182,64 @@ func serviceDetailsHandler(params api.ToolHandlerParams) (*api.ToolCallResult, e
 	content, err := kialiClient.ServiceDetails(params.Context, authHeader, namespace, service)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to get service details: %v", err)), nil
+	}
+	return api.NewToolCallResult(content, nil), nil
+}
+
+func serviceMetricsHandler(params api.ToolHandlerParams) (*api.ToolCallResult, error) {
+	// Extract required parameters
+	namespace, _ := params.GetArguments()["namespace"].(string)
+	service, _ := params.GetArguments()["service"].(string)
+
+	if namespace == "" {
+		return api.NewToolCallResult("", fmt.Errorf("namespace parameter is required")), nil
+	}
+	if service == "" {
+		return api.NewToolCallResult("", fmt.Errorf("service parameter is required")), nil
+	}
+
+	// Extract optional query parameters
+	queryParams := make(map[string]string)
+	if duration, ok := params.GetArguments()["duration"].(string); ok && duration != "" {
+		queryParams["duration"] = duration
+	}
+	if step, ok := params.GetArguments()["step"].(string); ok && step != "" {
+		queryParams["step"] = step
+	}
+	if rateInterval, ok := params.GetArguments()["rateInterval"].(string); ok && rateInterval != "" {
+		queryParams["rateInterval"] = rateInterval
+	}
+	if direction, ok := params.GetArguments()["direction"].(string); ok && direction != "" {
+		queryParams["direction"] = direction
+	}
+	if reporter, ok := params.GetArguments()["reporter"].(string); ok && reporter != "" {
+		queryParams["reporter"] = reporter
+	}
+	if requestProtocol, ok := params.GetArguments()["requestProtocol"].(string); ok && requestProtocol != "" {
+		queryParams["requestProtocol"] = requestProtocol
+	}
+	if quantiles, ok := params.GetArguments()["quantiles"].(string); ok && quantiles != "" {
+		queryParams["quantiles"] = quantiles
+	}
+	if byLabels, ok := params.GetArguments()["byLabels"].(string); ok && byLabels != "" {
+		queryParams["byLabels"] = byLabels
+	}
+
+	// Extract the Authorization header from context
+	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
+	if strings.TrimSpace(authHeader) == "" {
+		// Fall back to using the same token that the Kubernetes client is using
+		if params.Kubernetes != nil {
+			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
+		}
+	}
+
+	// Build a Kiali client from static config
+	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
+
+	content, err := kialiClient.ServiceMetrics(params.Context, authHeader, namespace, service, queryParams)
+	if err != nil {
+		return api.NewToolCallResult("", fmt.Errorf("failed to get service metrics: %v", err)), nil
 	}
 	return api.NewToolCallResult(content, nil), nil
 }
