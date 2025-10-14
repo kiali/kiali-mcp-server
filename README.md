@@ -298,16 +298,16 @@ The following sets of tools are available (only Kiali by default):
   - `service` (`string`) **(required)** - Name of the service to get details for
 
 - **service_metrics** - Get metrics for a specific service in a namespace. Supports filtering by time range, direction (inbound/outbound), reporter, and other query parameters
-  - `namespace` (`string`) **(required)** - Namespace containing the service
-  - `service` (`string`) **(required)** - Name of the service to get metrics for
-  - `duration` (`string`) - Duration of the query period in seconds (e.g., '1800' for 30 minutes). Optional, defaults to 1800 seconds
-  - `step` (`string`) - Step between data points in seconds (e.g., '15'). Optional, defaults to 15 seconds
-  - `rateInterval` (`string`) - Rate interval for metrics (e.g., '1m', '5m'). Optional, defaults to '1m'
+  - `byLabels` (`string`) - Comma-separated list of labels to group metrics by (e.g., 'source_workload,destination_service'). Optional
   - `direction` (`string`) - Traffic direction: 'inbound' or 'outbound'. Optional, defaults to 'outbound'
+  - `duration` (`string`) - Duration of the query period in seconds (e.g., '1800' for 30 minutes). Optional, defaults to 1800 seconds
+  - `namespace` (`string`) **(required)** - Namespace containing the service
+  - `quantiles` (`string`) - Comma-separated list of quantiles for histogram metrics (e.g., '0.5,0.95,0.99'). Optional
+  - `rateInterval` (`string`) - Rate interval for metrics (e.g., '1m', '5m'). Optional, defaults to '1m'
   - `reporter` (`string`) - Metrics reporter: 'source', 'destination', or 'both'. Optional, defaults to 'source'
   - `requestProtocol` (`string`) - Filter by request protocol (e.g., 'http', 'grpc', 'tcp'). Optional
-  - `quantiles` (`string`) - Comma-separated list of quantiles for histogram metrics (e.g., '0.5,0.95,0.99'). Optional
-  - `byLabels` (`string`) - Comma-separated list of labels to group metrics by (e.g., 'source_workload,destination_service'). Optional
+  - `service` (`string`) **(required)** - Name of the service to get metrics for
+  - `step` (`string`) - Step between data points in seconds (e.g., '15'). Optional, defaults to 15 seconds
 
 - **workloads_list** - Get all workloads in the mesh across specified namespaces with health and Istio resource information
   - `namespaces` (`string`) - Comma-separated list of namespaces to get workloads from (e.g. 'bookinfo' or 'bookinfo,default'). If not provided, will list workloads from all accessible namespaces
