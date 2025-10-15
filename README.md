@@ -6,7 +6,7 @@
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/kiali/kiali-mcp-server?sort=semver)](https://github.com/kiali/kiali-mcp-server/releases/latest)
 [![Build](https://github.com/kiali/kiali-mcp-server/actions/workflows/build.yaml/badge.svg)](https://github.com/kiali/kiali-mcp-server/actions/workflows/build.yaml)
 
-https://github.com/user-attachments/assets/0a7c1e08-2044-4426-92d6-89cbf6084ca1
+https://github.com/user-attachments/assets/376f2137-43ee-4fe0-810d-39028a97ac47
 
 **Kiali MCP Server** is a specialized Model Context Protocol (MCP) server that brings powerful Istio service mesh management capabilities to AI assistants like Claude, Cursor, and others. Built as an extension of the upstream Kubernetes MCP Server, it provides seamless integration with Kiali for service mesh observability and management.
 
@@ -47,7 +47,7 @@ Inherits all capabilities from the upstream Kubernetes MCP Server including pod 
 
 ### Quick Start with Claude Desktop
 
-https://github.com/user-attachments/assets/0a7c1e08-2044-4426-92d6-89cbf6084ca1
+https://github.com/user-attachments/assets/376f2137-43ee-4fe0-810d-39028a97ac47
 
 #### Using npx (Recommended)
 
