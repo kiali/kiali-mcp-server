@@ -316,6 +316,18 @@ The following sets of tools are available (only Kiali by default):
   - `namespace` (`string`) **(required)** - Namespace containing the workload
   - `workload` (`string`) **(required)** - Name of the workload to get details for
 
+- **workload_metrics** - Get metrics for a specific workload in a namespace. Supports filtering by time range, direction (inbound/outbound), reporter, and other query parameters
+  - `byLabels` (`string`) - Comma-separated list of labels to group metrics by (e.g., 'source_workload,destination_service'). Optional
+  - `direction` (`string`) - Traffic direction: 'inbound' or 'outbound'. Optional, defaults to 'outbound'
+  - `duration` (`string`) - Duration of the query period in seconds (e.g., '1800' for 30 minutes). Optional, defaults to 1800 seconds
+  - `namespace` (`string`) **(required)** - Namespace containing the workload
+  - `quantiles` (`string`) - Comma-separated list of quantiles for histogram metrics (e.g., '0.5,0.95,0.99'). Optional
+  - `rateInterval` (`string`) - Rate interval for metrics (e.g., '1m', '5m'). Optional, defaults to '1m'
+  - `reporter` (`string`) - Metrics reporter: 'source', 'destination', or 'both'. Optional, defaults to 'source'
+  - `requestProtocol` (`string`) - Filter by request protocol (e.g., 'http', 'grpc', 'tcp'). Optional
+  - `step` (`string`) - Step between data points in seconds (e.g., '15'). Optional, defaults to 15 seconds
+  - `workload` (`string`) **(required)** - Name of the workload to get metrics for
+
 </details>
 
 
