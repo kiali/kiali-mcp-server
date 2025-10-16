@@ -328,6 +328,12 @@ The following sets of tools are available (only Kiali by default):
   - `step` (`string`) - Step between data points in seconds (e.g., '15'). Optional, defaults to 15 seconds
   - `workload` (`string`) **(required)** - Name of the workload to get metrics for
 
+- **health** - Get health status for apps, workloads, and services across specified namespaces in the mesh. Returns health information including error rates and status for the requested resource type
+  - `namespaces` (`string`) - Comma-separated list of namespaces to get health from (e.g. 'bookinfo' or 'bookinfo,default'). If not provided, returns health for all accessible namespaces
+  - `queryTime` (`string`) - Unix timestamp (in seconds) for the prometheus query. If not provided, uses current time. Optional
+  - `rateInterval` (`string`) - Rate interval for fetching error rate (e.g., '10m', '5m', '1h'). Default: '10m'
+  - `type` (`string`) - Type of health to retrieve: 'app', 'service', or 'workload'. Default: 'app'
+
 </details>
 
 
