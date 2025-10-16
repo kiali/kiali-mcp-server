@@ -25,6 +25,38 @@
   },
   {
     "annotations": {
+      "title": "Health",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    },
+    "description": "Get health status for apps, workloads, and services across specified namespaces in the mesh. Returns health information including error rates and status for the requested resource type",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespaces": {
+          "description": "Comma-separated list of namespaces to get health from (e.g. 'bookinfo' or 'bookinfo,default'). If not provided, returns health for all accessible namespaces",
+          "type": "string"
+        },
+        "type": {
+          "description": "Type of health to retrieve: 'app', 'service', or 'workload'. Default: 'app'",
+          "type": "string"
+        },
+        "rateInterval": {
+          "description": "Rate interval for fetching error rate (e.g., '10m', '5m', '1h'). Default: '10m'",
+          "type": "string"
+        },
+        "queryTime": {
+          "description": "Unix timestamp (in seconds) for the prometheus query. If not provided, uses current time. Optional",
+          "type": "string"
+        }
+      }
+    },
+    "name": "health"
+  },
+  {
+    "annotations": {
       "title": "Istio Config: List All",
       "readOnlyHint": true,
       "destructiveHint": false,
