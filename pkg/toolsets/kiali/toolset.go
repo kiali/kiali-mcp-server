@@ -33,6 +33,7 @@ func (t *Toolset) GetTools(_ internalk8s.Openshift) []api.ServerTool {
 		initNamespaces(),
 		initServices(),
 		initWorkloads(),
+		initHealth(),
 	)
 }
 
