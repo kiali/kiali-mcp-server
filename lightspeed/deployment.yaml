@@ -1,0 +1,43 @@
+# creats a 1 pod deployment for the cluster-health-analyzer
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: kiali-mcp-server
+  name: kiali-mcp-server
+  namespace: istio-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kiali-mcp-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kiali-mcp-server
+    spec:
+      serviceAccountName: kiali-mcp-server
+      automountServiceAccountToken: true
+      containers:
+      - name: kiali-mcp-server
+        image: "quay.io/aljesusg/kiali_mcp_server:latest"
+        imagePullPolicy: Always
+        args:
+          - --toolsets
+          - kiali
+          - --port
+          - "8080"
+          - --kiali-server-url
+          - https://kiali-istio-system.apps-crc.testing/
+          - --kiali-insecure        
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        ports:
+        - containerPort: 8080
+          name: mcp
+        terminationMessagePolicy: FallbackToLogsOnError
