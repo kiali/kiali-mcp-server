@@ -24,6 +24,13 @@ NPM_VERSION ?= $(shell echo $(shell git describe --tags --always) | sed 's/^v//'
 OSES = darwin linux windows
 ARCHS = amd64 arm64
 
+# Image configuration
+IMAGE_REGISTRY ?= quay.io
+IMAGE_REPO ?= kiali/kiali-mcp-server
+IMAGE_TAG ?= $(if $(NPM_VERSION),$(NPM_VERSION),latest)
+IMAGE ?= $(IMAGE_REGISTRY)/$(IMAGE_REPO):$(IMAGE_TAG)
+
+# Targets
 CLEAN_TARGETS :=
 CLEAN_TARGETS += '$(BINARY_NAME)'
 CLEAN_TARGETS += '$(CLIENT_BINARY_NAME)'
@@ -66,7 +73,6 @@ build-all-platforms-client: clean tidy format ## Build the project for all platf
 	$(foreach os,$(OSES),$(foreach arch,$(ARCHS), \
 		GOOS=$(os) GOARCH=$(arch) go build $(COMMON_BUILD_ARGS) -o $(CLIENT_BINARY_NAME)-$(os)-$(arch)$(if $(findstring windows,$(os)),.exe,) ./cmd/kiali-mcp-client; \
 	))
-	
 
 .PHONY: npm-copy-binaries
 npm-copy-binaries: build-all-platforms ## Copy the binaries to each npm package

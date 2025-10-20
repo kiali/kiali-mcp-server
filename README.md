@@ -176,6 +176,22 @@ https://github.com/user-attachments/assets/d88a3b72-980c-43db-a69a-a19ad564cf49
 ```
 </details>
 
+<details>
+<summary>🚀 OpenShift Lightspeed Integration</summary>
+
+For deploying the Kiali MCP Server within OpenShift Lightspeed for AI-powered service mesh management directly in your OpenShift cluster, see the comprehensive guide:
+
+**[📖 Deploying with OpenShift Lightspeed](docs/LIGHTSPEED.md)**
+
+This guide covers:
+- Prerequisites and cluster setup
+- Step-by-step deployment instructions
+- LLM provider configuration
+- Troubleshooting and verification
+- Integration with OpenShift Lightspeed chat interface
+
+</details>
+
 ## ⚙️ Configuration <a id="configuration"></a>
 
 Kiali MCP Server extends the upstream Kubernetes MCP Server with additional Kiali-specific configuration options.
