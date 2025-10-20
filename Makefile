@@ -24,12 +24,6 @@ NPM_VERSION ?= $(shell echo $(shell git describe --tags --always) | sed 's/^v//'
 OSES = darwin linux windows
 ARCHS = amd64 arm64
 
-# Image configuration
-IMAGE_REGISTRY ?= quay.io
-IMAGE_REPO ?= kiali/kiali-mcp-server
-IMAGE_TAG ?= $(if $(NPM_VERSION),$(NPM_VERSION),latest)
-IMAGE ?= $(IMAGE_REGISTRY)/$(IMAGE_REPO):$(IMAGE_TAG)
-
 # Targets
 CLEAN_TARGETS :=
 CLEAN_TARGETS += '$(BINARY_NAME)'
