@@ -417,6 +417,51 @@
   },
   {
     "annotations": {
+      "title": "Workload: Logs",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true
+    },
+    "description": "Get logs for a specific workload's pods in a namespace. Retrieves logs from all containers of the workload's pods, with optional filtering by container name and time range",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "container": {
+          "description": "Optional container name to filter logs. If not provided, logs from all containers are returned",
+          "type": "string"
+        },
+        "namespace": {
+          "description": "Namespace containing the workload",
+          "type": "string"
+        },
+        "previous": {
+          "description": "Whether to include logs from previous terminated containers (default: false)",
+          "type": "boolean"
+        },
+        "since": {
+          "description": "Time duration to fetch logs from (e.g., '5m', '1h', '30s'). If not provided, returns recent logs",
+          "type": "string"
+        },
+        "tail": {
+          "description": "Number of lines to retrieve from the end of logs (default: 100)",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "workload": {
+          "description": "Name of the workload to get logs for",
+          "type": "string"
+        }
+      },
+      "required": [
+        "namespace",
+        "workload"
+      ]
+    },
+    "name": "workload_logs"
+  },
+  {
+    "annotations": {
       "title": "Workload: Metrics",
       "readOnlyHint": true,
       "destructiveHint": false,
