@@ -45,7 +45,7 @@ func namespacesHandler(params api.ToolHandlerParams) (*api.ToolCallResult, error
 	// Build a Kiali client from static config
 	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
 
-	content, err := kialiClient.MeshNamespaces(params.Context, authHeader)
+	content, err := kialiClient.ListNamespaces(params.Context, authHeader)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to list namespaces: %v", err)), nil
 	}

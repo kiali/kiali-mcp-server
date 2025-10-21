@@ -90,7 +90,7 @@ func graphHandler(params api.ToolHandlerParams) (*api.ToolCallResult, error) {
 		namespaces = unique
 	}
 
-	content, err := kialiClient.MeshGraph(params.Context, authHeader, namespaces)
+	content, err := kialiClient.Graph(params.Context, authHeader, namespaces)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to retrieve mesh graph: %v", err)), nil
 	}
