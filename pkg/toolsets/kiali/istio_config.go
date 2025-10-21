@@ -8,7 +8,6 @@ import (
 	"k8s.io/utils/ptr"
 
 	"github.com/kiali/kiali-mcp-server/pkg/api"
-	internalkiali "github.com/kiali/kiali-mcp-server/pkg/kiali"
 	internalk8s "github.com/kiali/kiali-mcp-server/pkg/kubernetes"
 )
 
@@ -44,10 +43,8 @@ func istioConfigHandler(params api.ToolHandlerParams) (*api.ToolCallResult, erro
 			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
 		}
 	}
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
 
-	content, err := kialiClient.IstioConfig(params.Context, authHeader)
+	content, err := params.IstioConfig(params.Context, authHeader)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to retrieve Istio configuration: %v", err)), nil
 	}
@@ -107,8 +104,6 @@ func istioObjectDetailsHandler(params api.ToolHandlerParams) (*api.ToolCallResul
 			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
 		}
 	}
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
 
 	// Extract required parameters
 	namespace, _ := params.GetArguments()["namespace"].(string)
@@ -117,7 +112,7 @@ func istioObjectDetailsHandler(params api.ToolHandlerParams) (*api.ToolCallResul
 	kind, _ := params.GetArguments()["kind"].(string)
 	name, _ := params.GetArguments()["name"].(string)
 
-	content, err := kialiClient.IstioObjectDetails(params.Context, authHeader, namespace, group, version, kind, name)
+	content, err := params.IstioObjectDetails(params.Context, authHeader, namespace, group, version, kind, name)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to retrieve Istio object details: %v", err)), nil
 	}
@@ -181,8 +176,6 @@ func istioObjectPatchHandler(params api.ToolHandlerParams) (*api.ToolCallResult,
 			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
 		}
 	}
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
 
 	// Extract required parameters
 	namespace, _ := params.GetArguments()["namespace"].(string)
@@ -192,7 +185,7 @@ func istioObjectPatchHandler(params api.ToolHandlerParams) (*api.ToolCallResult,
 	name, _ := params.GetArguments()["name"].(string)
 	jsonPatch, _ := params.GetArguments()["json_patch"].(string)
 
-	content, err := kialiClient.IstioObjectPatch(params.Context, authHeader, namespace, group, version, kind, name, jsonPatch)
+	content, err := params.IstioObjectPatch(params.Context, authHeader, namespace, group, version, kind, name, jsonPatch)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to patch Istio object: %v", err)), nil
 	}
@@ -252,8 +245,6 @@ func istioObjectCreateHandler(params api.ToolHandlerParams) (*api.ToolCallResult
 			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
 		}
 	}
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
 
 	// Extract required parameters
 	namespace, _ := params.GetArguments()["namespace"].(string)
@@ -262,7 +253,7 @@ func istioObjectCreateHandler(params api.ToolHandlerParams) (*api.ToolCallResult
 	kind, _ := params.GetArguments()["kind"].(string)
 	jsonData, _ := params.GetArguments()["json_data"].(string)
 
-	content, err := kialiClient.IstioObjectCreate(params.Context, authHeader, namespace, group, version, kind, jsonData)
+	content, err := params.IstioObjectCreate(params.Context, authHeader, namespace, group, version, kind, jsonData)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to create Istio object: %v", err)), nil
 	}
@@ -322,8 +313,6 @@ func istioObjectDeleteHandler(params api.ToolHandlerParams) (*api.ToolCallResult
 			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
 		}
 	}
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
 
 	// Extract required parameters
 	namespace, _ := params.GetArguments()["namespace"].(string)
@@ -332,7 +321,7 @@ func istioObjectDeleteHandler(params api.ToolHandlerParams) (*api.ToolCallResult
 	kind, _ := params.GetArguments()["kind"].(string)
 	name, _ := params.GetArguments()["name"].(string)
 
-	content, err := kialiClient.IstioObjectDelete(params.Context, authHeader, namespace, group, version, kind, name)
+	content, err := params.IstioObjectDelete(params.Context, authHeader, namespace, group, version, kind, name)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to delete Istio object: %v", err)), nil
 	}

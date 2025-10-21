@@ -93,12 +93,25 @@ func NewServer(configuration Configuration) (*Server, error) {
 			serverOptions...,
 		),
 	}
+	if err := s.reloadKialiClient(); err != nil {
+		return nil, err
+	}
 	if err := s.reloadKubernetesClient(); err != nil {
 		return nil, err
 	}
 	s.k.WatchKubeConfig(s.reloadKubernetesClient)
 
 	return s, nil
+}
+
+func (s *Server) reloadKialiClient() error {
+	kiali, err := internalkiali.NewManager(s.configuration.StaticConfig)
+	if err != nil {
+		return err
+	}
+	s.kiali = kiali
+
+	return nil
 }
 
 func (s *Server) reloadKubernetesClient() error {

@@ -12,7 +12,6 @@ import (
 
 	"github.com/kiali/kiali-mcp-server/pkg/config"
 	internalk8s "github.com/kiali/kiali-mcp-server/pkg/kubernetes"
-	"k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 )
 
@@ -21,8 +20,14 @@ type Kiali struct {
 }
 
 type Manager struct {
-	cfg          *rest.Config
 	staticConfig *config.StaticConfig
+}
+
+func NewManager(config *config.StaticConfig) (*Manager, error) {
+	kiali := &Manager{
+		staticConfig: config,
+	}
+	return kiali, nil
 }
 
 // NewFromConfig creates a new Kiali client backed by the given static configuration.
@@ -115,33 +120,12 @@ func (k *Kiali) executeRequestWithBody(ctx context.Context, authHeader, method, 
 func (m *Manager) Derived(ctx context.Context) (*Kiali, error) {
 	authorization, ok := ctx.Value(internalk8s.OAuthAuthorizationHeader).(string)
 	if !ok || !strings.HasPrefix(authorization, "Bearer ") {
-		if m.staticConfig.RequireOAuth {
+		if m.staticConfig != nil && m.staticConfig.RequireOAuth {
 			return nil, errors.New("oauth token required")
 		}
 		return &Kiali{manager: m}, nil
 	}
-	klog.V(5).Infof("%s header found (Bearer), using provided bearer token", internalk8s.OAuthAuthorizationHeader)
-	derivedCfg := &rest.Config{
-		Host:    m.cfg.Host,
-		APIPath: m.cfg.APIPath,
-		// Copy only server verification TLS settings (CA bundle and server name)
-		TLSClientConfig: rest.TLSClientConfig{
-			Insecure:   m.cfg.Insecure,
-			ServerName: m.cfg.ServerName,
-			CAFile:     m.cfg.CAFile,
-			CAData:     m.cfg.CAData,
-		},
-		BearerToken: strings.TrimPrefix(authorization, "Bearer "),
-		// pass custom UserAgent to identify the client
-		UserAgent:   internalk8s.CustomUserAgent,
-		QPS:         m.cfg.QPS,
-		Burst:       m.cfg.Burst,
-		Timeout:     m.cfg.Timeout,
-		Impersonate: rest.ImpersonationConfig{},
-	}
-	derived := &Kiali{manager: &Manager{
-		cfg:          derivedCfg,
-		staticConfig: m.staticConfig,
-	}}
-	return derived, nil
+	// Authorization header is present; nothing special is needed for the Kiali HTTP client
+	klog.V(5).Infof("%s header found (Bearer)", internalk8s.OAuthAuthorizationHeader)
+	return &Kiali{manager: m}, nil
 }

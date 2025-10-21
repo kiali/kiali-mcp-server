@@ -8,7 +8,6 @@ import (
 	"k8s.io/utils/ptr"
 
 	"github.com/kiali/kiali-mcp-server/pkg/api"
-	internalkiali "github.com/kiali/kiali-mcp-server/pkg/kiali"
 	internalk8s "github.com/kiali/kiali-mcp-server/pkg/kubernetes"
 )
 
@@ -53,8 +52,6 @@ func graphHandler(params api.ToolHandlerParams) (*api.ToolCallResult, error) {
 			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
 		}
 	}
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
 
 	// Parse arguments: allow either `namespace` or `namespaces` (comma-separated string)
 	namespaces := make([]string, 0)
@@ -90,7 +87,7 @@ func graphHandler(params api.ToolHandlerParams) (*api.ToolCallResult, error) {
 		namespaces = unique
 	}
 
-	content, err := kialiClient.Graph(params.Context, authHeader, namespaces)
+	content, err := params.Graph(params.Context, authHeader, namespaces)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to retrieve mesh graph: %v", err)), nil
 	}

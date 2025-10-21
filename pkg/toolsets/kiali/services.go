@@ -8,7 +8,6 @@ import (
 	"k8s.io/utils/ptr"
 
 	"github.com/kiali/kiali-mcp-server/pkg/api"
-	internalkiali "github.com/kiali/kiali-mcp-server/pkg/kiali"
 	internalk8s "github.com/kiali/kiali-mcp-server/pkg/kubernetes"
 )
 
@@ -145,10 +144,7 @@ func servicesListHandler(params api.ToolHandlerParams) (*api.ToolCallResult, err
 		}
 	}
 
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
-
-	content, err := kialiClient.ServicesList(params.Context, authHeader, namespaces)
+	content, err := params.ServicesList(params.Context, authHeader, namespaces)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to list services: %v", err)), nil
 	}
@@ -176,10 +172,7 @@ func serviceDetailsHandler(params api.ToolHandlerParams) (*api.ToolCallResult, e
 		}
 	}
 
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
-
-	content, err := kialiClient.ServiceDetails(params.Context, authHeader, namespace, service)
+	content, err := params.ServiceDetails(params.Context, authHeader, namespace, service)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to get service details: %v", err)), nil
 	}
@@ -234,10 +227,7 @@ func serviceMetricsHandler(params api.ToolHandlerParams) (*api.ToolCallResult, e
 		}
 	}
 
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
-
-	content, err := kialiClient.ServiceMetrics(params.Context, authHeader, namespace, service, queryParams)
+	content, err := params.ServiceMetrics(params.Context, authHeader, namespace, service, queryParams)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to get service metrics: %v", err)), nil
 	}
