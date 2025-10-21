@@ -2,13 +2,11 @@ package kiali
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"k8s.io/utils/ptr"
 
 	"github.com/kiali/kiali-mcp-server/pkg/api"
-	internalk8s "github.com/kiali/kiali-mcp-server/pkg/kubernetes"
 )
 
 func initHealth() []api.ServerTool {
@@ -73,16 +71,7 @@ func clusterHealthHandler(params api.ToolHandlerParams) (*api.ToolCallResult, er
 		queryParams["queryTime"] = queryTime
 	}
 
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
-
-	content, err := params.Health(params.Context, authHeader, namespaces, queryParams)
+	content, err := params.Health(params.Context, namespaces, queryParams)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to get health: %v", err)), nil
 	}

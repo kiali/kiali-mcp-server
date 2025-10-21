@@ -148,6 +148,11 @@ func (k *Kubernetes) CurrentAuthorizationHeader() string {
 	if token == "" {
 		return ""
 	}
+	// Normalize to exactly "Bearer <token>" without double prefix
+	lower := strings.ToLower(token)
+	if strings.HasPrefix(lower, "bearer ") {
+		return "Bearer " + strings.TrimSpace(token[7:])
+	}
 	return "Bearer " + token
 }
 

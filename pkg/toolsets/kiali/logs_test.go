@@ -198,7 +198,7 @@ func TestWorkloadLogs_KialiClient(t *testing.T) {
 			kialiClient := internalkiali.NewFromConfig(cfg)
 
 			// Test the WorkloadLogs method
-			result, err := kialiClient.WorkloadLogs(context.Background(), "Bearer test-token", tt.namespace, tt.workload, tt.container, "", "", "", "", "")
+			result, err := kialiClient.WorkloadLogs(context.Background(), tt.namespace, tt.workload, tt.container, "", "", "", "", "")
 
 			// Check for expected errors
 			if tt.expectedError {
@@ -531,7 +531,6 @@ func TestWorkloadLogsRealWorldScenarios(t *testing.T) {
 
 			result, err := kialiClient.WorkloadLogs(
 				context.Background(),
-				"Bearer test-token",
 				scenario.namespace,
 				scenario.workload,
 				scenario.container,

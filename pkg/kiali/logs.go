@@ -19,7 +19,7 @@ import (
 //   - logType: type of logs (app, proxy, ztunnel, waypoint) - optional
 //   - sinceTime: Unix timestamp for start time - optional
 //   - maxLines: maximum number of lines to return - optional
-func (k *Kiali) WorkloadLogs(ctx context.Context, authHeader string, namespace string, workload string, container string, service string, duration string, logType string, sinceTime string, maxLines string) (string, error) {
+func (k *Kiali) WorkloadLogs(ctx context.Context, namespace string, workload string, container string, service string, duration string, logType string, sinceTime string, maxLines string) (string, error) {
 	if namespace == "" {
 		return "", fmt.Errorf("namespace is required")
 	}
@@ -29,7 +29,7 @@ func (k *Kiali) WorkloadLogs(ctx context.Context, authHeader string, namespace s
 	// Container is optional - will be auto-detected if not provided
 
 	// First, get workload details to find associated pods
-	workloadDetails, err := k.WorkloadDetails(ctx, authHeader, namespace, workload)
+	workloadDetails, err := k.WorkloadDetails(ctx, namespace, workload)
 	if err != nil {
 		return "", fmt.Errorf("failed to get workload details: %v", err)
 	}
@@ -76,7 +76,7 @@ func (k *Kiali) WorkloadLogs(ctx context.Context, authHeader string, namespace s
 			continue
 		}
 
-		podLogs, err := k.PodLogs(ctx, authHeader, namespace, pod.Name, podContainer, workload, service, duration, logType, sinceTime, maxLines)
+		podLogs, err := k.PodLogs(ctx, namespace, pod.Name, podContainer, workload, service, duration, logType, sinceTime, maxLines)
 		if err != nil {
 			// Log the error but continue with other pods
 			allLogs = append(allLogs, fmt.Sprintf("Error getting logs for pod %s: %v", pod.Name, err))
@@ -105,7 +105,7 @@ func (k *Kiali) WorkloadLogs(ctx context.Context, authHeader string, namespace s
 //   - logType: type of logs (app, proxy, ztunnel, waypoint) - optional
 //   - sinceTime: Unix timestamp for start time - optional
 //   - maxLines: maximum number of lines to return - optional
-func (k *Kiali) PodLogs(ctx context.Context, authHeader string, namespace string, podName string, container string, workload string, service string, duration string, logType string, sinceTime string, maxLines string) (string, error) {
+func (k *Kiali) PodLogs(ctx context.Context, namespace string, podName string, container string, workload string, service string, duration string, logType string, sinceTime string, maxLines string) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -120,7 +120,7 @@ func (k *Kiali) PodLogs(ctx context.Context, authHeader string, namespace string
 	podContainer := container
 	if podContainer == "" {
 		// Get pod details to find containers
-		podDetails, err := k.executeRequest(ctx, authHeader, fmt.Sprintf("%s/api/namespaces/%s/pods/%s", strings.TrimRight(baseURL, "/"), url.PathEscape(namespace), url.PathEscape(podName)))
+		podDetails, err := k.executeRequest(ctx, fmt.Sprintf("%s/api/namespaces/%s/pods/%s", strings.TrimRight(baseURL, "/"), url.PathEscape(namespace), url.PathEscape(podName)))
 		if err != nil {
 			return "", fmt.Errorf("failed to get pod details: %v", err)
 		}
@@ -189,5 +189,5 @@ func (k *Kiali) PodLogs(ctx context.Context, authHeader string, namespace string
 	u.RawQuery = q.Encode()
 	endpoint = u.String()
 
-	return k.executeRequest(ctx, authHeader, endpoint)
+	return k.executeRequest(ctx, endpoint)
 }

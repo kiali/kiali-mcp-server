@@ -8,7 +8,7 @@ import (
 )
 
 // WorkloadsList returns the list of workloads across specified namespaces.
-func (k *Kiali) WorkloadsList(ctx context.Context, authHeader string, namespaces string) (string, error) {
+func (k *Kiali) WorkloadsList(ctx context.Context, namespaces string) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -18,11 +18,11 @@ func (k *Kiali) WorkloadsList(ctx context.Context, authHeader string, namespaces
 		endpoint += "&namespaces=" + url.QueryEscape(namespaces)
 	}
 
-	return k.executeRequest(ctx, authHeader, endpoint)
+	return k.executeRequest(ctx, endpoint)
 }
 
 // WorkloadDetails returns the details for a specific workload in a namespace.
-func (k *Kiali) WorkloadDetails(ctx context.Context, authHeader string, namespace string, workload string) (string, error) {
+func (k *Kiali) WorkloadDetails(ctx context.Context, namespace string, workload string) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -36,7 +36,7 @@ func (k *Kiali) WorkloadDetails(ctx context.Context, authHeader string, namespac
 	endpoint := fmt.Sprintf("%s/api/namespaces/%s/workloads/%s?validate=true&rateInterval=60s&health=true",
 		strings.TrimRight(baseURL, "/"), url.PathEscape(namespace), url.PathEscape(workload))
 
-	return k.executeRequest(ctx, authHeader, endpoint)
+	return k.executeRequest(ctx, endpoint)
 }
 
 // WorkloadMetrics returns the metrics for a specific workload in a namespace.
@@ -44,7 +44,7 @@ func (k *Kiali) WorkloadDetails(ctx context.Context, authHeader string, namespac
 //   - namespace: the namespace containing the workload
 //   - workload: the name of the workload
 //   - queryParams: optional query parameters map for filtering metrics (e.g., "duration", "step", "rateInterval", "direction", "reporter", "filters[]", "byLabels[]", etc.)
-func (k *Kiali) WorkloadMetrics(ctx context.Context, authHeader string, namespace string, workload string, queryParams map[string]string) (string, error) {
+func (k *Kiali) WorkloadMetrics(ctx context.Context, namespace string, workload string, queryParams map[string]string) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -73,5 +73,5 @@ func (k *Kiali) WorkloadMetrics(ctx context.Context, authHeader string, namespac
 		endpoint = u.String()
 	}
 
-	return k.executeRequest(ctx, authHeader, endpoint)
+	return k.executeRequest(ctx, endpoint)
 }

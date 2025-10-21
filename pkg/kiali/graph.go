@@ -9,7 +9,7 @@ import (
 // Graph calls the Kiali graph API using the provided Authorization header value.
 // `namespaces` may contain zero, one or many namespaces. If empty, the API may return an empty graph
 // or the server default, depending on Kiali configuration.
-func (k *Kiali) Graph(ctx context.Context, authHeader string, namespaces []string) (string, error) {
+func (k *Kiali) Graph(ctx context.Context, namespaces []string) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -46,5 +46,5 @@ func (k *Kiali) Graph(ctx context.Context, authHeader string, namespaces []strin
 	u.RawQuery = q.Encode()
 	endpoint = u.String()
 
-	return k.executeRequest(ctx, authHeader, endpoint)
+	return k.executeRequest(ctx, endpoint)
 }

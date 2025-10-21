@@ -13,7 +13,7 @@ import (
 //   - type: health type - "app", "service", or "workload" (default: "app")
 //   - rateInterval: rate interval for fetching error rate (default: "10m")
 //   - queryTime: Unix timestamp for the prometheus query (optional)
-func (k *Kiali) Health(ctx context.Context, authHeader string, namespaces string, queryParams map[string]string) (string, error) {
+func (k *Kiali) Health(ctx context.Context, namespaces string, queryParams map[string]string) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -43,5 +43,5 @@ func (k *Kiali) Health(ctx context.Context, authHeader string, namespaces string
 	u.RawQuery = q.Encode()
 	endpoint = u.String()
 
-	return k.executeRequest(ctx, authHeader, endpoint)
+	return k.executeRequest(ctx, endpoint)
 }

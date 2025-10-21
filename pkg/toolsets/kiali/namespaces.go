@@ -2,13 +2,11 @@ package kiali
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"k8s.io/utils/ptr"
 
 	"github.com/kiali/kiali-mcp-server/pkg/api"
-	internalk8s "github.com/kiali/kiali-mcp-server/pkg/kubernetes"
 )
 
 func initNamespaces() []api.ServerTool {
@@ -33,16 +31,7 @@ func initNamespaces() []api.ServerTool {
 }
 
 func namespacesHandler(params api.ToolHandlerParams) (*api.ToolCallResult, error) {
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
-
-	content, err := params.ListNamespaces(params.Context, authHeader)
+	content, err := params.ListNamespaces(params.Context)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to list namespaces: %v", err)), nil
 	}

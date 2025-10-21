@@ -2,14 +2,11 @@ package kiali
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"k8s.io/utils/ptr"
 
 	"github.com/kiali/kiali-mcp-server/pkg/api"
-	internalkiali "github.com/kiali/kiali-mcp-server/pkg/kiali"
-	internalk8s "github.com/kiali/kiali-mcp-server/pkg/kubernetes"
 )
 
 func initWorkloads() []api.ServerTool {
@@ -136,19 +133,7 @@ func workloadsListHandler(params api.ToolHandlerParams) (*api.ToolCallResult, er
 	// Extract parameters
 	namespaces, _ := params.GetArguments()["namespaces"].(string)
 
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
-
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
-
-	content, err := kialiClient.WorkloadsList(params.Context, authHeader, namespaces)
+	content, err := params.WorkloadsList(params.Context, namespaces)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to list workloads: %v", err)), nil
 	}
@@ -167,19 +152,7 @@ func workloadDetailsHandler(params api.ToolHandlerParams) (*api.ToolCallResult, 
 		return api.NewToolCallResult("", fmt.Errorf("workload parameter is required")), nil
 	}
 
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
-
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
-
-	content, err := kialiClient.WorkloadDetails(params.Context, authHeader, namespace, workload)
+	content, err := params.WorkloadDetails(params.Context, namespace, workload)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to get workload details: %v", err)), nil
 	}
@@ -225,19 +198,7 @@ func workloadMetricsHandler(params api.ToolHandlerParams) (*api.ToolCallResult, 
 		queryParams["byLabels"] = byLabels
 	}
 
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
-
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
-
-	content, err := kialiClient.WorkloadMetrics(params.Context, authHeader, namespace, workload, queryParams)
+	content, err := params.WorkloadMetrics(params.Context, namespace, workload, queryParams)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to get workload metrics: %v", err)), nil
 	}

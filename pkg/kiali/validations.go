@@ -7,9 +7,8 @@ import (
 )
 
 // ValidationsList calls the Kiali validations API using the provided Authorization header value.
-// The authHeader must be the full header value (for example: "Bearer <token>").
 // `namespaces` may contain zero, one or many namespaces. If empty, returns validations from all namespaces.
-func (k *Kiali) ValidationsList(ctx context.Context, authHeader string, namespaces []string) (string, error) {
+func (k *Kiali) ValidationsList(ctx context.Context, namespaces []string) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -35,5 +34,5 @@ func (k *Kiali) ValidationsList(ctx context.Context, authHeader string, namespac
 		endpoint = u.String()
 	}
 
-	return k.executeRequest(ctx, authHeader, endpoint)
+	return k.executeRequest(ctx, endpoint)
 }
