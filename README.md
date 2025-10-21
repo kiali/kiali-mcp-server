@@ -350,6 +350,14 @@ The following sets of tools are available (only Kiali by default):
   - `rateInterval` (`string`) - Rate interval for fetching error rate (e.g., '10m', '5m', '1h'). Default: '10m'
   - `type` (`string`) - Type of health to retrieve: 'app', 'service', or 'workload'. Default: 'app'
 
+- **workload_logs** - Get logs for a specific workload's pods in a namespace. Only requires namespace and workload name - automatically discovers pods and containers. Optionally filter by container name, time range, and other parameters. Container is auto-detected if not specified.
+  - `container` (`string`) - Optional container name to filter logs. If not provided, automatically detects and uses the main application container (excludes istio-proxy and istio-init)
+  - `namespace` (`string`) **(required)** - Namespace containing the workload
+  - `previous` (`boolean`) - Whether to include logs from previous terminated containers (default: false)
+  - `since` (`string`) - Time duration to fetch logs from (e.g., '5m', '1h', '30s'). If not provided, returns recent logs
+  - `tail` (`integer`) - Number of lines to retrieve from the end of logs (default: 100)
+  - `workload` (`string`) **(required)** - Name of the workload to get logs for
+
 </details>
 
 

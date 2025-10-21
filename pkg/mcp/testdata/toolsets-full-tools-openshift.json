@@ -957,6 +957,51 @@
   },
   {
     "annotations": {
+      "title": "Workload: Logs",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": true
+    },
+    "description": "Get logs for a specific workload's pods in a namespace. Only requires namespace and workload name - automatically discovers pods and containers. Optionally filter by container name, time range, and other parameters. Container is auto-detected if not specified.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "container": {
+          "description": "Optional container name to filter logs. If not provided, automatically detects and uses the main application container (excludes istio-proxy and istio-init)",
+          "type": "string"
+        },
+        "namespace": {
+          "description": "Namespace containing the workload",
+          "type": "string"
+        },
+        "previous": {
+          "description": "Whether to include logs from previous terminated containers (default: false)",
+          "type": "boolean"
+        },
+        "since": {
+          "description": "Time duration to fetch logs from (e.g., '5m', '1h', '30s'). If not provided, returns recent logs",
+          "type": "string"
+        },
+        "tail": {
+          "description": "Number of lines to retrieve from the end of logs (default: 100)",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "workload": {
+          "description": "Name of the workload to get logs for",
+          "type": "string"
+        }
+      },
+      "required": [
+        "namespace",
+        "workload"
+      ]
+    },
+    "name": "workload_logs"
+  },
+  {
+    "annotations": {
       "title": "Workload: Metrics",
       "readOnlyHint": true,
       "destructiveHint": false,
