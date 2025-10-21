@@ -10,14 +10,14 @@ import (
 
 // IstioConfig calls the Kiali Istio config API to get all Istio objects in the mesh.
 // Returns the full YAML resources and additional details about each object.
-func (k *Kiali) IstioConfig(ctx context.Context, authHeader string) (string, error) {
+func (k *Kiali) IstioConfig(ctx context.Context) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
 	}
 	endpoint := strings.TrimRight(baseURL, "/") + "/api/istio/config?validate=true"
 
-	return k.executeRequest(ctx, authHeader, endpoint)
+	return k.executeRequest(ctx, endpoint)
 }
 
 // IstioObjectDetails returns detailed information about a specific Istio object.
@@ -27,7 +27,7 @@ func (k *Kiali) IstioConfig(ctx context.Context, authHeader string) (string, err
 //   - version: the API version (e.g., "v1", "v1beta1")
 //   - kind: the resource kind (e.g., "DestinationRule", "VirtualService", "HTTPRoute")
 //   - name: the name of the resource
-func (k *Kiali) IstioObjectDetails(ctx context.Context, authHeader string, namespace, group, version, kind, name string) (string, error) {
+func (k *Kiali) IstioObjectDetails(ctx context.Context, namespace, group, version, kind, name string) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -55,7 +55,7 @@ func (k *Kiali) IstioObjectDetails(ctx context.Context, authHeader string, names
 		url.PathEscape(kind),
 		url.PathEscape(name))
 
-	return k.executeRequest(ctx, authHeader, endpoint)
+	return k.executeRequest(ctx, endpoint)
 }
 
 // IstioObjectPatch patches an existing Istio object using PATCH method.
@@ -66,7 +66,7 @@ func (k *Kiali) IstioObjectDetails(ctx context.Context, authHeader string, names
 //   - kind: the resource kind (e.g., "DestinationRule", "VirtualService", "HTTPRoute")
 //   - name: the name of the resource
 //   - jsonPatch: the JSON patch data to apply
-func (k *Kiali) IstioObjectPatch(ctx context.Context, authHeader string, namespace, group, version, kind, name, jsonPatch string) (string, error) {
+func (k *Kiali) IstioObjectPatch(ctx context.Context, namespace, group, version, kind, name, jsonPatch string) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -97,7 +97,7 @@ func (k *Kiali) IstioObjectPatch(ctx context.Context, authHeader string, namespa
 		url.PathEscape(kind),
 		url.PathEscape(name))
 
-	return k.executeRequestWithBody(ctx, authHeader, http.MethodPatch, endpoint, "application/json", strings.NewReader(jsonPatch))
+	return k.executeRequestWithBody(ctx, http.MethodPatch, endpoint, "application/json", strings.NewReader(jsonPatch))
 }
 
 // IstioObjectCreate creates a new Istio object using POST method.
@@ -107,7 +107,7 @@ func (k *Kiali) IstioObjectPatch(ctx context.Context, authHeader string, namespa
 //   - version: the API version (e.g., "v1", "v1beta1")
 //   - kind: the resource kind (e.g., "DestinationRule", "VirtualService", "HTTPRoute")
 //   - jsonData: the JSON data for the new object
-func (k *Kiali) IstioObjectCreate(ctx context.Context, authHeader string, namespace, group, version, kind, jsonData string) (string, error) {
+func (k *Kiali) IstioObjectCreate(ctx context.Context, namespace, group, version, kind, jsonData string) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -134,7 +134,7 @@ func (k *Kiali) IstioObjectCreate(ctx context.Context, authHeader string, namesp
 		url.PathEscape(version),
 		url.PathEscape(kind))
 
-	return k.executeRequestWithBody(ctx, authHeader, http.MethodPost, endpoint, "application/json", strings.NewReader(jsonData))
+	return k.executeRequestWithBody(ctx, http.MethodPost, endpoint, "application/json", strings.NewReader(jsonData))
 }
 
 // IstioObjectDelete deletes an existing Istio object using DELETE method.
@@ -144,7 +144,7 @@ func (k *Kiali) IstioObjectCreate(ctx context.Context, authHeader string, namesp
 //   - version: the API version (e.g., "v1", "v1beta1")
 //   - kind: the resource kind (e.g., "DestinationRule", "VirtualService", "HTTPRoute", "Gateway")
 //   - name: the name of the resource
-func (k *Kiali) IstioObjectDelete(ctx context.Context, authHeader string, namespace, group, version, kind, name string) (string, error) {
+func (k *Kiali) IstioObjectDelete(ctx context.Context, namespace, group, version, kind, name string) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -172,5 +172,5 @@ func (k *Kiali) IstioObjectDelete(ctx context.Context, authHeader string, namesp
 		url.PathEscape(kind),
 		url.PathEscape(name))
 
-	return k.executeRequestWithBody(ctx, authHeader, http.MethodDelete, endpoint, "", nil)
+	return k.executeRequestWithBody(ctx, http.MethodDelete, endpoint, "", nil)
 }

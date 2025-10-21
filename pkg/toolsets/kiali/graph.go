@@ -8,7 +8,6 @@ import (
 	"k8s.io/utils/ptr"
 
 	"github.com/kiali/kiali-mcp-server/pkg/api"
-	internalk8s "github.com/kiali/kiali-mcp-server/pkg/kubernetes"
 )
 
 func initGraph() []api.ServerTool {
@@ -44,14 +43,6 @@ func initGraph() []api.ServerTool {
 }
 
 func graphHandler(params api.ToolHandlerParams) (*api.ToolCallResult, error) {
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
 
 	// Parse arguments: allow either `namespace` or `namespaces` (comma-separated string)
 	namespaces := make([]string, 0)
@@ -87,7 +78,7 @@ func graphHandler(params api.ToolHandlerParams) (*api.ToolCallResult, error) {
 		namespaces = unique
 	}
 
-	content, err := params.Graph(params.Context, authHeader, namespaces)
+	content, err := params.Graph(params.Context, namespaces)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to retrieve mesh graph: %v", err)), nil
 	}

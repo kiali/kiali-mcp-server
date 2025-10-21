@@ -2,13 +2,11 @@ package kiali
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"k8s.io/utils/ptr"
 
 	"github.com/kiali/kiali-mcp-server/pkg/api"
-	internalk8s "github.com/kiali/kiali-mcp-server/pkg/kubernetes"
 )
 
 func initIstioConfig() []api.ServerTool {
@@ -35,16 +33,7 @@ func initIstioConfig() []api.ServerTool {
 }
 
 func istioConfigHandler(params api.ToolHandlerParams) (*api.ToolCallResult, error) {
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
-
-	content, err := params.IstioConfig(params.Context, authHeader)
+	content, err := params.IstioConfig(params.Context)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to retrieve Istio configuration: %v", err)), nil
 	}
@@ -96,15 +85,6 @@ func initIstioObjectDetails() []api.ServerTool {
 }
 
 func istioObjectDetailsHandler(params api.ToolHandlerParams) (*api.ToolCallResult, error) {
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
-
 	// Extract required parameters
 	namespace, _ := params.GetArguments()["namespace"].(string)
 	group, _ := params.GetArguments()["group"].(string)
@@ -112,7 +92,7 @@ func istioObjectDetailsHandler(params api.ToolHandlerParams) (*api.ToolCallResul
 	kind, _ := params.GetArguments()["kind"].(string)
 	name, _ := params.GetArguments()["name"].(string)
 
-	content, err := params.IstioObjectDetails(params.Context, authHeader, namespace, group, version, kind, name)
+	content, err := params.IstioObjectDetails(params.Context, namespace, group, version, kind, name)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to retrieve Istio object details: %v", err)), nil
 	}
@@ -168,15 +148,6 @@ func initIstioObjectPatch() []api.ServerTool {
 }
 
 func istioObjectPatchHandler(params api.ToolHandlerParams) (*api.ToolCallResult, error) {
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
-
 	// Extract required parameters
 	namespace, _ := params.GetArguments()["namespace"].(string)
 	group, _ := params.GetArguments()["group"].(string)
@@ -185,7 +156,7 @@ func istioObjectPatchHandler(params api.ToolHandlerParams) (*api.ToolCallResult,
 	name, _ := params.GetArguments()["name"].(string)
 	jsonPatch, _ := params.GetArguments()["json_patch"].(string)
 
-	content, err := params.IstioObjectPatch(params.Context, authHeader, namespace, group, version, kind, name, jsonPatch)
+	content, err := params.IstioObjectPatch(params.Context, namespace, group, version, kind, name, jsonPatch)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to patch Istio object: %v", err)), nil
 	}
@@ -237,15 +208,6 @@ func initIstioObjectCreate() []api.ServerTool {
 }
 
 func istioObjectCreateHandler(params api.ToolHandlerParams) (*api.ToolCallResult, error) {
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
-
 	// Extract required parameters
 	namespace, _ := params.GetArguments()["namespace"].(string)
 	group, _ := params.GetArguments()["group"].(string)
@@ -253,7 +215,7 @@ func istioObjectCreateHandler(params api.ToolHandlerParams) (*api.ToolCallResult
 	kind, _ := params.GetArguments()["kind"].(string)
 	jsonData, _ := params.GetArguments()["json_data"].(string)
 
-	content, err := params.IstioObjectCreate(params.Context, authHeader, namespace, group, version, kind, jsonData)
+	content, err := params.IstioObjectCreate(params.Context, namespace, group, version, kind, jsonData)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to create Istio object: %v", err)), nil
 	}
@@ -305,15 +267,6 @@ func initIstioObjectDelete() []api.ServerTool {
 }
 
 func istioObjectDeleteHandler(params api.ToolHandlerParams) (*api.ToolCallResult, error) {
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
-
 	// Extract required parameters
 	namespace, _ := params.GetArguments()["namespace"].(string)
 	group, _ := params.GetArguments()["group"].(string)
@@ -321,7 +274,7 @@ func istioObjectDeleteHandler(params api.ToolHandlerParams) (*api.ToolCallResult
 	kind, _ := params.GetArguments()["kind"].(string)
 	name, _ := params.GetArguments()["name"].(string)
 
-	content, err := params.IstioObjectDelete(params.Context, authHeader, namespace, group, version, kind, name)
+	content, err := params.IstioObjectDelete(params.Context, namespace, group, version, kind, name)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to delete Istio object: %v", err)), nil
 	}

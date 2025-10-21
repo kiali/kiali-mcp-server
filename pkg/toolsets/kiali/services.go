@@ -2,13 +2,11 @@ package kiali
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"k8s.io/utils/ptr"
 
 	"github.com/kiali/kiali-mcp-server/pkg/api"
-	internalk8s "github.com/kiali/kiali-mcp-server/pkg/kubernetes"
 )
 
 func initServices() []api.ServerTool {
@@ -135,16 +133,7 @@ func servicesListHandler(params api.ToolHandlerParams) (*api.ToolCallResult, err
 	// Extract parameters
 	namespaces, _ := params.GetArguments()["namespaces"].(string)
 
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
-
-	content, err := params.ServicesList(params.Context, authHeader, namespaces)
+	content, err := params.ServicesList(params.Context, namespaces)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to list services: %v", err)), nil
 	}
@@ -162,17 +151,7 @@ func serviceDetailsHandler(params api.ToolHandlerParams) (*api.ToolCallResult, e
 	if service == "" {
 		return api.NewToolCallResult("", fmt.Errorf("service parameter is required")), nil
 	}
-
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
-
-	content, err := params.ServiceDetails(params.Context, authHeader, namespace, service)
+	content, err := params.ServiceDetails(params.Context, namespace, service)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to get service details: %v", err)), nil
 	}
@@ -218,16 +197,7 @@ func serviceMetricsHandler(params api.ToolHandlerParams) (*api.ToolCallResult, e
 		queryParams["byLabels"] = byLabels
 	}
 
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
-
-	content, err := params.ServiceMetrics(params.Context, authHeader, namespace, service, queryParams)
+	content, err := params.ServiceMetrics(params.Context, namespace, service, queryParams)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to get service metrics: %v", err)), nil
 	}

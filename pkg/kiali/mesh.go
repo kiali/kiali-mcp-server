@@ -9,7 +9,7 @@ import (
 // MeshStatus calls the Kiali mesh graph API to get the status of mesh components.
 // This returns information about mesh components like Istio, Kiali, Grafana, Prometheus
 // and their interactions, versions, and health status.
-func (k *Kiali) MeshStatus(ctx context.Context, authHeader string) (string, error) {
+func (k *Kiali) MeshStatus(ctx context.Context) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -26,5 +26,5 @@ func (k *Kiali) MeshStatus(ctx context.Context, authHeader string) (string, erro
 	u.RawQuery = q.Encode()
 	endpoint = u.String()
 
-	return k.executeRequest(ctx, authHeader, endpoint)
+	return k.executeRequest(ctx, endpoint)
 }

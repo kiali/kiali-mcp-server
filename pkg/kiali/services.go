@@ -8,7 +8,7 @@ import (
 )
 
 // ServicesList returns the list of services across specified namespaces.
-func (k *Kiali) ServicesList(ctx context.Context, authHeader string, namespaces string) (string, error) {
+func (k *Kiali) ServicesList(ctx context.Context, namespaces string) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -18,11 +18,11 @@ func (k *Kiali) ServicesList(ctx context.Context, authHeader string, namespaces 
 		endpoint += "&namespaces=" + url.QueryEscape(namespaces)
 	}
 
-	return k.executeRequest(ctx, authHeader, endpoint)
+	return k.executeRequest(ctx, endpoint)
 }
 
 // ServiceDetails returns the details for a specific service in a namespace.
-func (k *Kiali) ServiceDetails(ctx context.Context, authHeader string, namespace string, service string) (string, error) {
+func (k *Kiali) ServiceDetails(ctx context.Context, namespace string, service string) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -36,7 +36,7 @@ func (k *Kiali) ServiceDetails(ctx context.Context, authHeader string, namespace
 	endpoint := fmt.Sprintf("%s/api/namespaces/%s/services/%s?validate=true&rateInterval=60s",
 		strings.TrimRight(baseURL, "/"), url.PathEscape(namespace), url.PathEscape(service))
 
-	return k.executeRequest(ctx, authHeader, endpoint)
+	return k.executeRequest(ctx, endpoint)
 }
 
 // ServiceMetrics returns the metrics for a specific service in a namespace.
@@ -44,7 +44,7 @@ func (k *Kiali) ServiceDetails(ctx context.Context, authHeader string, namespace
 //   - namespace: the namespace containing the service
 //   - service: the name of the service
 //   - queryParams: optional query parameters map for filtering metrics (e.g., "duration", "step", "rateInterval", "direction", "reporter", "filters[]", "byLabels[]", etc.)
-func (k *Kiali) ServiceMetrics(ctx context.Context, authHeader string, namespace string, service string, queryParams map[string]string) (string, error) {
+func (k *Kiali) ServiceMetrics(ctx context.Context, namespace string, service string, queryParams map[string]string) (string, error) {
 	baseURL, err := k.validateAndGetBaseURL()
 	if err != nil {
 		return "", err
@@ -73,5 +73,5 @@ func (k *Kiali) ServiceMetrics(ctx context.Context, authHeader string, namespace
 		endpoint = u.String()
 	}
 
-	return k.executeRequest(ctx, authHeader, endpoint)
+	return k.executeRequest(ctx, endpoint)
 }

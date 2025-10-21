@@ -3,13 +3,11 @@ package kiali
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/google/jsonschema-go/jsonschema"
 	"k8s.io/utils/ptr"
 
 	"github.com/kiali/kiali-mcp-server/pkg/api"
-	internalk8s "github.com/kiali/kiali-mcp-server/pkg/kubernetes"
 )
 
 func initLogs() []api.ServerTool {
@@ -111,18 +109,9 @@ func workloadLogsHandler(params api.ToolHandlerParams) (*api.ToolCallResult, err
 		}
 	}
 
-	// Extract the Authorization header from context
-	authHeader, _ := params.Context.Value(internalk8s.OAuthAuthorizationHeader).(string)
-	if strings.TrimSpace(authHeader) == "" {
-		// Fall back to using the same token that the Kubernetes client is using
-		if params.Kubernetes != nil {
-			authHeader = params.Kubernetes.CurrentAuthorizationHeader()
-		}
-	}
-
 	// If no container specified, we need to get workload details first to find the main app container
 	if container == "" {
-		workloadDetails, err := params.WorkloadDetails(params.Context, authHeader, namespace, workload)
+		workloadDetails, err := params.WorkloadDetails(params.Context, namespace, workload)
 		if err != nil {
 			return api.NewToolCallResult("", fmt.Errorf("failed to get workload details: %v", err)), nil
 		}
@@ -169,7 +158,7 @@ func workloadLogsHandler(params api.ToolHandlerParams) (*api.ToolCallResult, err
 	}
 
 	// Use the WorkloadLogs method with the correct parameters
-	logs, err := params.WorkloadLogs(params.Context, authHeader, namespace, workload, container, service, duration, logType, sinceTime, maxLines)
+	logs, err := params.WorkloadLogs(params.Context, namespace, workload, container, service, duration, logType, sinceTime, maxLines)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to get workload logs: %v", err)), nil
 	}

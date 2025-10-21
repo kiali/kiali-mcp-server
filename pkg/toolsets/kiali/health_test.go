@@ -50,7 +50,6 @@ func TestHealth_KialiClient(t *testing.T) {
 		result, err := kialiClient.Health(
 			context.Background(),
 			"",
-			"",
 			nil,
 		)
 
@@ -88,7 +87,6 @@ func TestHealth_KialiClient(t *testing.T) {
 
 		result, err := kialiClient.Health(
 			context.Background(),
-			"",
 			"bookinfo,default",
 			nil,
 		)
@@ -128,7 +126,6 @@ func TestHealth_KialiClient(t *testing.T) {
 
 		result, err := kialiClient.Health(
 			context.Background(),
-			"",
 			"bookinfo",
 			queryParams,
 		)
@@ -166,7 +163,6 @@ func TestHealth_KialiClient(t *testing.T) {
 
 		result, err := kialiClient.Health(
 			context.Background(),
-			"",
 			"bookinfo",
 			queryParams,
 		)
@@ -204,7 +200,6 @@ func TestHealth_KialiClient(t *testing.T) {
 
 		result, err := kialiClient.Health(
 			context.Background(),
-			"",
 			"bookinfo",
 			queryParams,
 		)
@@ -240,7 +235,6 @@ func TestHealth_KialiClient(t *testing.T) {
 
 		result, err := kialiClient.Health(
 			context.Background(),
-			"",
 			"bookinfo",
 			queryParams,
 		)
@@ -276,7 +270,6 @@ func TestHealth_KialiClient(t *testing.T) {
 
 		result, err := kialiClient.Health(
 			context.Background(),
-			"",
 			"bookinfo",
 			queryParams,
 		)
@@ -316,7 +309,6 @@ func TestHealth_KialiClient(t *testing.T) {
 
 		result, err := kialiClient.Health(
 			context.Background(),
-			"",
 			"bookinfo,default",
 			queryParams,
 		)
@@ -340,7 +332,6 @@ func TestHealth_KialiClient(t *testing.T) {
 
 		_, err := kialiClient.Health(
 			context.Background(),
-			"",
 			"bookinfo",
 			nil,
 		)
@@ -364,7 +355,6 @@ func TestHealth_KialiClient(t *testing.T) {
 
 		_, err := kialiClient.Health(
 			context.Background(),
-			"",
 			"non-existent-namespace",
 			nil,
 		)
@@ -388,7 +378,6 @@ func TestHealth_KialiClient(t *testing.T) {
 
 		_, err := kialiClient.Health(
 			context.Background(),
-			"",
 			"bookinfo",
 			nil,
 		)
@@ -424,7 +413,6 @@ func TestHealth_KialiClient(t *testing.T) {
 		result, err := kialiClient.Health(
 			context.Background(),
 			"",
-			"",
 			nil,
 		)
 
@@ -456,7 +444,6 @@ func TestHealth_KialiClient(t *testing.T) {
 
 		result, err := kialiClient.Health(
 			context.Background(),
-			"",
 			"my-namespace-123,test-ns-456",
 			nil,
 		)
@@ -594,7 +581,6 @@ func TestHealthRealWorldScenarios(t *testing.T) {
 		result, err := kialiClient.Health(
 			context.Background(),
 			"",
-			"",
 			nil,
 		)
 
@@ -643,7 +629,6 @@ func TestHealthRealWorldScenarios(t *testing.T) {
 
 		result, err := kialiClient.Health(
 			context.Background(),
-			"",
 			"bookinfo",
 			queryParams,
 		)
@@ -694,7 +679,6 @@ func TestHealthRealWorldScenarios(t *testing.T) {
 
 		result, err := kialiClient.Health(
 			context.Background(),
-			"",
 			"bookinfo,istio-system",
 			queryParams,
 		)
