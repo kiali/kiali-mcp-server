@@ -9,7 +9,6 @@ import (
 	"k8s.io/utils/ptr"
 
 	"github.com/kiali/kiali-mcp-server/pkg/api"
-	internalkiali "github.com/kiali/kiali-mcp-server/pkg/kiali"
 	internalk8s "github.com/kiali/kiali-mcp-server/pkg/kubernetes"
 )
 
@@ -121,12 +120,9 @@ func workloadLogsHandler(params api.ToolHandlerParams) (*api.ToolCallResult, err
 		}
 	}
 
-	// Build a Kiali client
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
-
 	// If no container specified, we need to get workload details first to find the main app container
 	if container == "" {
-		workloadDetails, err := kialiClient.WorkloadDetails(params.Context, authHeader, namespace, workload)
+		workloadDetails, err := params.WorkloadDetails(params.Context, authHeader, namespace, workload)
 		if err != nil {
 			return api.NewToolCallResult("", fmt.Errorf("failed to get workload details: %v", err)), nil
 		}
@@ -173,7 +169,7 @@ func workloadLogsHandler(params api.ToolHandlerParams) (*api.ToolCallResult, err
 	}
 
 	// Use the WorkloadLogs method with the correct parameters
-	logs, err := kialiClient.WorkloadLogs(params.Context, authHeader, namespace, workload, container, service, duration, logType, sinceTime, maxLines)
+	logs, err := params.WorkloadLogs(params.Context, authHeader, namespace, workload, container, service, duration, logType, sinceTime, maxLines)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to get workload logs: %v", err)), nil
 	}
