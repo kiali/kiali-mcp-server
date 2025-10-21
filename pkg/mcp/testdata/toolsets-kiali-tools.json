@@ -423,12 +423,12 @@
       "idempotentHint": false,
       "openWorldHint": true
     },
-    "description": "Get logs for a specific workload's pods in a namespace. Retrieves logs from all containers of the workload's pods, with optional filtering by container name and time range",
+    "description": "Get logs for a specific workload's pods in a namespace. Only requires namespace and workload name - automatically discovers pods and containers. Optionally filter by container name, time range, and other parameters. Container is auto-detected if not specified.",
     "inputSchema": {
       "type": "object",
       "properties": {
         "container": {
-          "description": "Optional container name to filter logs. If not provided, logs from all containers are returned",
+          "description": "Optional container name to filter logs. If not provided, automatically detects and uses the main application container (excludes istio-proxy and istio-init)",
           "type": "string"
         },
         "namespace": {
