@@ -142,7 +142,7 @@ func TestAppTraces_KialiClient(t *testing.T) {
 			kialiClient := internalkiali.NewFromConfig(cfg)
 
 			// Test the AppTraces method
-			result, err := kialiClient.AppTraces(context.Background(), "Bearer test-token", tt.namespace, tt.app, tt.queryParams)
+			result, err := kialiClient.AppTraces(context.Background(), tt.namespace, tt.app, tt.queryParams)
 
 			// Check for expected errors
 			if tt.expectedError {
@@ -294,7 +294,7 @@ func TestServiceTraces_KialiClient(t *testing.T) {
 			kialiClient := internalkiali.NewFromConfig(cfg)
 
 			// Test the ServiceTraces method
-			result, err := kialiClient.ServiceTraces(context.Background(), "Bearer test-token", tt.namespace, tt.service, tt.queryParams)
+			result, err := kialiClient.ServiceTraces(context.Background(), tt.namespace, tt.service, tt.queryParams)
 
 			// Check for expected errors
 			if tt.expectedError {
@@ -446,7 +446,7 @@ func TestWorkloadTraces_KialiClient(t *testing.T) {
 			kialiClient := internalkiali.NewFromConfig(cfg)
 
 			// Test the WorkloadTraces method
-			result, err := kialiClient.WorkloadTraces(context.Background(), "Bearer test-token", tt.namespace, tt.workload, tt.queryParams)
+			result, err := kialiClient.WorkloadTraces(context.Background(), tt.namespace, tt.workload, tt.queryParams)
 
 			// Check for expected errors
 			if tt.expectedError {
