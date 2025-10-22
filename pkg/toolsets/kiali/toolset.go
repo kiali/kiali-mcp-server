@@ -35,6 +35,7 @@ func (t *Toolset) GetTools(_ internalk8s.Openshift) []api.ServerTool {
 		initWorkloads(),
 		initHealth(),
 		initLogs(),
+		initTraces(),
 	)
 }
 
