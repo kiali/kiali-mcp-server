@@ -7,7 +7,6 @@ import (
 	"k8s.io/utils/ptr"
 
 	"github.com/kiali/kiali-mcp-server/pkg/api"
-	internalkiali "github.com/kiali/kiali-mcp-server/pkg/kiali"
 )
 
 func initTraces() []api.ServerTool {
@@ -210,10 +209,7 @@ func appTracesHandler(params api.ToolHandlerParams) (*api.ToolCallResult, error)
 		queryParams["clusterName"] = clusterName
 	}
 
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
-
-	content, err := kialiClient.AppTraces(params.Context, namespace, app, queryParams)
+	content, err := params.AppTraces(params.Context, namespace, app, queryParams)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to get app traces: %v", err)), nil
 	}
@@ -246,10 +242,7 @@ func serviceTracesHandler(params api.ToolHandlerParams) (*api.ToolCallResult, er
 		queryParams["clusterName"] = clusterName
 	}
 
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
-
-	content, err := kialiClient.ServiceTraces(params.Context, namespace, service, queryParams)
+	content, err := params.ServiceTraces(params.Context, namespace, service, queryParams)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to get service traces: %v", err)), nil
 	}
@@ -282,10 +275,7 @@ func workloadTracesHandler(params api.ToolHandlerParams) (*api.ToolCallResult, e
 		queryParams["clusterName"] = clusterName
 	}
 
-	// Build a Kiali client from static config
-	kialiClient := internalkiali.NewFromConfig(params.Kubernetes.StaticConfig())
-
-	content, err := kialiClient.WorkloadTraces(params.Context, namespace, workload, queryParams)
+	content, err := params.WorkloadTraces(params.Context, namespace, workload, queryParams)
 	if err != nil {
 		return api.NewToolCallResult("", fmt.Errorf("failed to get workload traces: %v", err)), nil
 	}
