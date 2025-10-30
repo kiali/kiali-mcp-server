@@ -111,34 +111,6 @@
   },
   {
     "annotations": {
-      "title": "Mesh Health Summary",
-      "readOnlyHint": true,
-      "destructiveHint": false,
-      "idempotentHint": true,
-      "openWorldHint": true
-    },
-    "description": "Get aggregated health summary for the entire mesh or specific namespaces. Returns overall availability, error rates, and counts of healthy/unhealthy entities across apps, services, and workloads. Provides global and per-namespace breakdowns with identification of top unhealthy entities.",
-    "inputSchema": {
-      "type": "object",
-      "properties": {
-        "namespaces": {
-          "description": "Comma-separated list of namespaces to include in summary (e.g. 'bookinfo,default'). If not provided, summarizes health for all accessible namespaces",
-          "type": "string"
-        },
-        "rateInterval": {
-          "description": "Rate interval for fetching error rate (e.g., '10m', '5m', '1h'). Default: '10m'",
-          "type": "string"
-        },
-        "queryTime": {
-          "description": "Unix timestamp (in seconds) for the prometheus query. If not provided, uses current time. Optional",
-          "type": "string"
-        }
-      }
-    },
-    "name": "mesh_health_summary"
-  },
-  {
-    "annotations": {
       "title": "Istio Config: List All",
       "readOnlyHint": true,
       "destructiveHint": false,
@@ -327,6 +299,34 @@
       ]
     },
     "name": "istio_object_patch"
+  },
+  {
+    "annotations": {
+      "title": "Mesh Health Summary",
+      "readOnlyHint": true,
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true
+    },
+    "description": "Get aggregated health summary for the entire mesh or specific namespaces. Returns overall availability, error rates, and counts of healthy/unhealthy entities across apps, services, and workloads. Provides global and per-namespace breakdowns with identification of top unhealthy entities.",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "namespaces": {
+          "description": "Comma-separated list of namespaces to include in summary (e.g. 'bookinfo,default'). If not provided, summarizes health for all accessible namespaces",
+          "type": "string"
+        },
+        "rateInterval": {
+          "description": "Rate interval for fetching error rate (e.g., '10m', '5m', '1h'). Default: '10m'",
+          "type": "string"
+        },
+        "queryTime": {
+          "description": "Unix timestamp (in seconds) for the prometheus query. If not provided, uses current time. Optional",
+          "type": "string"
+        }
+      }
+    },
+    "name": "mesh_health_summary"
   },
   {
     "annotations": {
