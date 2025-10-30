@@ -690,3 +690,447 @@ func TestHealthRealWorldScenarios(t *testing.T) {
 		assert.Equal(t, "workload", capturedURL.Query().Get("type"))
 	})
 }
+
+// TestMeshHealthSummary_KialiClient tests the Kiali client MeshHealthSummary method
+func TestMeshHealthSummary_KialiClient(t *testing.T) {
+	t.Run("successful mesh health summary with healthy mesh", func(t *testing.T) {
+		// Mock server that responds to three parallel calls (app, service, workload)
+		callCount := 0
+		mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			callCount++
+			w.Header().Set("Content-Type", "application/json")
+
+			healthType := r.URL.Query().Get("type")
+			switch healthType {
+			case "app":
+				response := map[string]interface{}{
+					"namespaceAppHealth": map[string]interface{}{
+						"bookinfo": map[string]interface{}{
+							"productpage": map[string]interface{}{
+								"workloadStatuses": []map[string]interface{}{
+									{
+										"name":              "productpage-v1",
+										"desiredReplicas":   1,
+										"currentReplicas":   1,
+										"availableReplicas": 1,
+										"syncedProxies":     1,
+									},
+								},
+								"requests": map[string]interface{}{
+									"inbound": map[string]interface{}{
+										"http": map[string]interface{}{
+											"200": 10.0,
+										},
+									},
+									"outbound":          map[string]interface{}{},
+									"healthAnnotations": map[string]interface{}{},
+								},
+							},
+						},
+					},
+				}
+				json.NewEncoder(w).Encode(response)
+			case "service":
+				response := map[string]interface{}{
+					"namespaceServiceHealth": map[string]interface{}{
+						"bookinfo": map[string]interface{}{
+							"productpage": map[string]interface{}{
+								"requests": map[string]interface{}{
+									"inbound": map[string]interface{}{
+										"http": map[string]interface{}{
+											"200": 10.0,
+										},
+									},
+									"outbound":          map[string]interface{}{},
+									"healthAnnotations": map[string]interface{}{},
+								},
+							},
+						},
+					},
+				}
+				json.NewEncoder(w).Encode(response)
+			case "workload":
+				response := map[string]interface{}{
+					"namespaceWorkloadHealth": map[string]interface{}{
+						"bookinfo": map[string]interface{}{
+							"productpage-v1": map[string]interface{}{
+								"workloadStatus": map[string]interface{}{
+									"name":              "productpage-v1",
+									"desiredReplicas":   1,
+									"currentReplicas":   1,
+									"availableReplicas": 1,
+									"syncedProxies":     1,
+								},
+								"requests": map[string]interface{}{
+									"inbound": map[string]interface{}{
+										"http": map[string]interface{}{
+											"200": 10.0,
+										},
+									},
+									"outbound":          map[string]interface{}{},
+									"healthAnnotations": map[string]interface{}{},
+								},
+							},
+						},
+					},
+				}
+				json.NewEncoder(w).Encode(response)
+			}
+		}))
+		defer mockServer.Close()
+
+		staticConfig := &config.StaticConfig{
+			KialiServerURL: mockServer.URL,
+		}
+
+		kialiClient := internalkiali.NewFromConfig(staticConfig)
+
+		result, err := kialiClient.MeshHealthSummary(
+			context.Background(),
+			"",
+			nil,
+		)
+
+		require.NoError(t, err)
+		assert.NotEmpty(t, result)
+
+		// Verify it made 3 calls (app, service, workload)
+		assert.Equal(t, 3, callCount)
+
+		// Parse and verify result
+		var summary map[string]interface{}
+		err = json.Unmarshal([]byte(result), &summary)
+		require.NoError(t, err)
+
+		assert.Equal(t, "HEALTHY", summary["overallStatus"])
+		assert.Equal(t, float64(100), summary["availability"])
+		assert.Contains(t, summary, "entityCounts")
+		assert.Contains(t, summary, "namespaceSummary")
+	})
+
+	t.Run("mesh health summary with degraded workload", func(t *testing.T) {
+		mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+
+			healthType := r.URL.Query().Get("type")
+			switch healthType {
+			case "app":
+				response := map[string]interface{}{
+					"namespaceAppHealth": map[string]interface{}{
+						"bookinfo": map[string]interface{}{
+							"ratings": map[string]interface{}{
+								"workloadStatuses": []map[string]interface{}{
+									{
+										"name":              "ratings-v1",
+										"desiredReplicas":   2,
+										"currentReplicas":   2,
+										"availableReplicas": 1, // Only 1 out of 2 available
+										"syncedProxies":     1,
+									},
+								},
+								"requests": map[string]interface{}{
+									"inbound":           map[string]interface{}{},
+									"outbound":          map[string]interface{}{},
+									"healthAnnotations": map[string]interface{}{},
+								},
+							},
+						},
+					},
+				}
+				json.NewEncoder(w).Encode(response)
+			case "service":
+				response := map[string]interface{}{
+					"namespaceServiceHealth": map[string]interface{}{
+						"bookinfo": map[string]interface{}{
+							"ratings": map[string]interface{}{
+								"requests": map[string]interface{}{
+									"inbound":           map[string]interface{}{},
+									"outbound":          map[string]interface{}{},
+									"healthAnnotations": map[string]interface{}{},
+								},
+							},
+						},
+					},
+				}
+				json.NewEncoder(w).Encode(response)
+			case "workload":
+				response := map[string]interface{}{
+					"namespaceWorkloadHealth": map[string]interface{}{
+						"bookinfo": map[string]interface{}{
+							"ratings-v1": map[string]interface{}{
+								"workloadStatus": map[string]interface{}{
+									"name":              "ratings-v1",
+									"desiredReplicas":   2,
+									"currentReplicas":   2,
+									"availableReplicas": 1,
+									"syncedProxies":     1,
+								},
+								"requests": map[string]interface{}{
+									"inbound":           map[string]interface{}{},
+									"outbound":          map[string]interface{}{},
+									"healthAnnotations": map[string]interface{}{},
+								},
+							},
+						},
+					},
+				}
+				json.NewEncoder(w).Encode(response)
+			}
+		}))
+		defer mockServer.Close()
+
+		staticConfig := &config.StaticConfig{
+			KialiServerURL: mockServer.URL,
+		}
+
+		kialiClient := internalkiali.NewFromConfig(staticConfig)
+
+		result, err := kialiClient.MeshHealthSummary(
+			context.Background(),
+			"bookinfo",
+			nil,
+		)
+
+		require.NoError(t, err)
+		assert.NotEmpty(t, result)
+
+		var summary map[string]interface{}
+		err = json.Unmarshal([]byte(result), &summary)
+		require.NoError(t, err)
+
+		// Should be DEGRADED because not all replicas are available
+		assert.Equal(t, "DEGRADED", summary["overallStatus"])
+	})
+
+	t.Run("mesh health summary with high error rate", func(t *testing.T) {
+		mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+
+			healthType := r.URL.Query().Get("type")
+			switch healthType {
+			case "app":
+				response := map[string]interface{}{
+					"namespaceAppHealth": map[string]interface{}{
+						"bookinfo": map[string]interface{}{
+							"productpage": map[string]interface{}{
+								"workloadStatuses": []map[string]interface{}{
+									{
+										"name":              "productpage-v1",
+										"desiredReplicas":   1,
+										"currentReplicas":   1,
+										"availableReplicas": 1,
+										"syncedProxies":     1,
+									},
+								},
+								"requests": map[string]interface{}{
+									"inbound": map[string]interface{}{
+										"http": map[string]interface{}{
+											"200": 80.0,
+											"500": 20.0, // 20% error rate
+										},
+									},
+									"outbound":          map[string]interface{}{},
+									"healthAnnotations": map[string]interface{}{},
+								},
+							},
+						},
+					},
+				}
+				json.NewEncoder(w).Encode(response)
+			case "service":
+				response := map[string]interface{}{
+					"namespaceServiceHealth": map[string]interface{}{
+						"bookinfo": map[string]interface{}{
+							"productpage": map[string]interface{}{
+								"requests": map[string]interface{}{
+									"inbound": map[string]interface{}{
+										"http": map[string]interface{}{
+											"200": 80.0,
+											"500": 20.0,
+										},
+									},
+									"outbound":          map[string]interface{}{},
+									"healthAnnotations": map[string]interface{}{},
+								},
+							},
+						},
+					},
+				}
+				json.NewEncoder(w).Encode(response)
+			case "workload":
+				response := map[string]interface{}{
+					"namespaceWorkloadHealth": map[string]interface{}{
+						"bookinfo": map[string]interface{}{
+							"productpage-v1": map[string]interface{}{
+								"workloadStatus": map[string]interface{}{
+									"name":              "productpage-v1",
+									"desiredReplicas":   1,
+									"currentReplicas":   1,
+									"availableReplicas": 1,
+									"syncedProxies":     1,
+								},
+								"requests": map[string]interface{}{
+									"inbound": map[string]interface{}{
+										"http": map[string]interface{}{
+											"200": 80.0,
+											"500": 20.0,
+										},
+									},
+									"outbound":          map[string]interface{}{},
+									"healthAnnotations": map[string]interface{}{},
+								},
+							},
+						},
+					},
+				}
+				json.NewEncoder(w).Encode(response)
+			}
+		}))
+		defer mockServer.Close()
+
+		staticConfig := &config.StaticConfig{
+			KialiServerURL: mockServer.URL,
+		}
+
+		kialiClient := internalkiali.NewFromConfig(staticConfig)
+
+		result, err := kialiClient.MeshHealthSummary(
+			context.Background(),
+			"bookinfo",
+			nil,
+		)
+
+		require.NoError(t, err)
+		assert.NotEmpty(t, result)
+
+		var summary map[string]interface{}
+		err = json.Unmarshal([]byte(result), &summary)
+		require.NoError(t, err)
+
+		// Should be UNHEALTHY due to high error rate (>5%)
+		assert.Equal(t, "UNHEALTHY", summary["overallStatus"])
+		assert.Contains(t, summary, "topUnhealthy")
+	})
+
+	t.Run("mesh health summary with custom rate interval", func(t *testing.T) {
+		var capturedQueryParams []string
+		mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			capturedQueryParams = append(capturedQueryParams, r.URL.Query().Get("rateInterval"))
+			w.Header().Set("Content-Type", "application/json")
+
+			healthType := r.URL.Query().Get("type")
+			switch healthType {
+			case "app":
+				json.NewEncoder(w).Encode(map[string]interface{}{"namespaceAppHealth": map[string]interface{}{}})
+			case "service":
+				json.NewEncoder(w).Encode(map[string]interface{}{"namespaceServiceHealth": map[string]interface{}{}})
+			case "workload":
+				json.NewEncoder(w).Encode(map[string]interface{}{"namespaceWorkloadHealth": map[string]interface{}{}})
+			}
+		}))
+		defer mockServer.Close()
+
+		staticConfig := &config.StaticConfig{
+			KialiServerURL: mockServer.URL,
+		}
+
+		kialiClient := internalkiali.NewFromConfig(staticConfig)
+
+		queryParams := map[string]string{
+			"rateInterval": "5m",
+		}
+
+		result, err := kialiClient.MeshHealthSummary(
+			context.Background(),
+			"",
+			queryParams,
+		)
+
+		require.NoError(t, err)
+		assert.NotEmpty(t, result)
+
+		// Verify rateInterval was passed to all 3 calls
+		assert.Len(t, capturedQueryParams, 3)
+		for _, param := range capturedQueryParams {
+			assert.Equal(t, "5m", param)
+		}
+	})
+
+	t.Run("Kiali server error during summary", func(t *testing.T) {
+		mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Internal error"))
+		}))
+		defer mockServer.Close()
+
+		staticConfig := &config.StaticConfig{
+			KialiServerURL: mockServer.URL,
+		}
+
+		kialiClient := internalkiali.NewFromConfig(staticConfig)
+
+		_, err := kialiClient.MeshHealthSummary(
+			context.Background(),
+			"",
+			nil,
+		)
+
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to fetch")
+	})
+}
+
+// TestHealthSummaryToolDefinition tests the mesh_health_summary tool definition
+func TestHealthSummaryToolDefinition(t *testing.T) {
+	tools := initHealthSummary()
+
+	var summaryTool *api.Tool
+	for i := range tools {
+		if tools[i].Tool.Name == "mesh_health_summary" {
+			summaryTool = &tools[i].Tool
+			break
+		}
+	}
+
+	require.NotNil(t, summaryTool, "mesh_health_summary tool should be registered")
+
+	t.Run("tool has correct name", func(t *testing.T) {
+		assert.Equal(t, "mesh_health_summary", summaryTool.Name)
+	})
+
+	t.Run("tool has description", func(t *testing.T) {
+		assert.NotEmpty(t, summaryTool.Description)
+		assert.Contains(t, strings.ToLower(summaryTool.Description), "summary")
+		assert.Contains(t, strings.ToLower(summaryTool.Description), "health")
+	})
+
+	t.Run("tool has input schema", func(t *testing.T) {
+		assert.NotNil(t, summaryTool.InputSchema)
+		assert.Equal(t, "object", summaryTool.InputSchema.Type)
+	})
+
+	t.Run("tool has correct parameters", func(t *testing.T) {
+		schema := summaryTool.InputSchema
+		require.NotNil(t, schema)
+		assert.NotNil(t, schema.Properties)
+
+		expectedParams := []string{
+			"namespaces", "rateInterval", "queryTime",
+		}
+
+		for _, param := range expectedParams {
+			_, exists := schema.Properties[param]
+			assert.True(t, exists, "Parameter %s should exist in schema", param)
+		}
+	})
+
+	t.Run("tool has annotations", func(t *testing.T) {
+		annotations := summaryTool.Annotations
+		assert.NotNil(t, annotations.ReadOnlyHint)
+		assert.True(t, *annotations.ReadOnlyHint)
+		assert.NotNil(t, annotations.DestructiveHint)
+		assert.False(t, *annotations.DestructiveHint)
+		assert.NotNil(t, annotations.IdempotentHint)
+		assert.True(t, *annotations.IdempotentHint)
+	})
+}
