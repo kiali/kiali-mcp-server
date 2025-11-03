@@ -162,6 +162,13 @@ func NewStreamableHTTP(serverURL string, options ...StreamableHTTPCOption) (*Str
 
 // Start initiates the HTTP connection to the server.
 func (c *StreamableHTTP) Start(ctx context.Context) error {
+	// Start is idempotent - check if already initialized
+	select {
+	case <-c.initialized:
+		return nil
+	default:
+	}
+
 	// For Streamable HTTP, we don't need to establish a persistent connection by default
 	if c.getListeningEnabled {
 		go func() {
@@ -258,7 +265,7 @@ func (c *StreamableHTTP) SendRequest(
 	ctx, cancel := c.contextAwareOfClientClose(ctx)
 	defer cancel()
 
-	resp, err := c.sendHTTP(ctx, http.MethodPost, bytes.NewReader(requestBody), "application/json, text/event-stream")
+	resp, err := c.sendHTTP(ctx, http.MethodPost, bytes.NewReader(requestBody), "application/json, text/event-stream", request.Header)
 	if err != nil {
 		if errors.Is(err, ErrSessionTerminated) && request.Method == string(mcp.MethodInitialize) {
 			// If the request is initialize, should not return a SessionTerminated error
@@ -339,11 +346,17 @@ func (c *StreamableHTTP) sendHTTP(
 	method string,
 	body io.Reader,
 	acceptType string,
+	header http.Header,
 ) (resp *http.Response, err error) {
 	// Create HTTP request
 	req, err := http.NewRequestWithContext(ctx, method, c.serverURL.String(), body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	// request headers
+	if header != nil {
+		req.Header = header
 	}
 
 	// Set headers
@@ -368,7 +381,7 @@ func (c *StreamableHTTP) sendHTTP(
 		authHeader, err := c.oauthHandler.GetAuthorizationHeader(ctx)
 		if err != nil {
 			// If we get an authorization error, return a specific error that can be handled by the client
-			if err.Error() == "no valid token available, authorization required" {
+			if errors.Is(err, ErrOAuthAuthorizationRequired) {
 				return nil, &OAuthAuthorizationRequiredError{
 					Handler: c.oauthHandler,
 				}
@@ -539,7 +552,7 @@ func (c *StreamableHTTP) SendNotification(ctx context.Context, notification mcp.
 	ctx, cancel := c.contextAwareOfClientClose(ctx)
 	defer cancel()
 
-	resp, err := c.sendHTTP(ctx, http.MethodPost, bytes.NewReader(requestBody), "application/json, text/event-stream")
+	resp, err := c.sendHTTP(ctx, http.MethodPost, bytes.NewReader(requestBody), "application/json, text/event-stream", nil)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
 	}
@@ -594,10 +607,14 @@ func (c *StreamableHTTP) IsOAuthEnabled() bool {
 func (c *StreamableHTTP) listenForever(ctx context.Context) {
 	c.logger.Infof("listening to server forever")
 	for {
-		connectCtx, cancel := context.WithCancel(ctx)
-		err := c.createGETConnectionToServer(connectCtx)
-		cancel()
-
+		// Use the original context for continuous listening - no per-iteration timeout
+		// The SSE connection itself will detect disconnections via the underlying HTTP transport,
+		// and the context cancellation will propagate from the parent to stop listening gracefully.
+		// We don't add an artificial timeout here because:
+		// 1. Persistent SSE connections are meant to stay open indefinitely
+		// 2. Network-level timeouts and keep-alives handle connection health
+		// 3. Context cancellation (user-initiated or system shutdown) provides clean shutdown
+		err := c.createGETConnectionToServer(ctx)
 		if errors.Is(err, ErrGetMethodNotAllowed) {
 			// server does not support listening
 			c.logger.Errorf("server does not support listening")
@@ -631,7 +648,7 @@ var (
 )
 
 func (c *StreamableHTTP) createGETConnectionToServer(ctx context.Context) error {
-	resp, err := c.sendHTTP(ctx, http.MethodGet, nil, "text/event-stream")
+	resp, err := c.sendHTTP(ctx, http.MethodGet, nil, "text/event-stream", nil)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
 	}
@@ -746,7 +763,7 @@ func (c *StreamableHTTP) sendResponseToServer(ctx context.Context, response *JSO
 	ctx, cancel := c.contextAwareOfClientClose(ctx)
 	defer cancel()
 
-	resp, err := c.sendHTTP(ctx, http.MethodPost, bytes.NewReader(responseBody), "application/json, text/event-stream")
+	resp, err := c.sendHTTP(ctx, http.MethodPost, bytes.NewReader(responseBody), "application/json, text/event-stream", nil)
 	if err != nil {
 		c.logger.Errorf("failed to send response to server: %v", err)
 		return

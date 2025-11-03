@@ -14,11 +14,14 @@ type InProcessTransport struct {
 	server             *server.MCPServer
 	samplingHandler    server.SamplingHandler
 	elicitationHandler server.ElicitationHandler
+	rootsHandler       server.RootsHandler
 	session            *server.InProcessSession
 	sessionID          string
 
 	onNotification func(mcp.JSONRPCNotification)
 	notifyMu       sync.RWMutex
+	started        bool
+	startedMu      sync.Mutex
 }
 
 type InProcessOption func(*InProcessTransport)
@@ -32,6 +35,12 @@ func WithSamplingHandler(handler server.SamplingHandler) InProcessOption {
 func WithElicitationHandler(handler server.ElicitationHandler) InProcessOption {
 	return func(t *InProcessTransport) {
 		t.elicitationHandler = handler
+	}
+}
+
+func WithRootsHandler(handler server.RootsHandler) InProcessOption {
+	return func(t *InProcessTransport) {
+		t.rootsHandler = handler
 	}
 }
 
@@ -55,10 +64,21 @@ func NewInProcessTransportWithOptions(server *server.MCPServer, opts ...InProces
 }
 
 func (c *InProcessTransport) Start(ctx context.Context) error {
+	c.startedMu.Lock()
+	if c.started {
+		c.startedMu.Unlock()
+		return nil
+	}
+	c.started = true
+	c.startedMu.Unlock()
+
 	// Create and register session if we have handlers
-	if c.samplingHandler != nil || c.elicitationHandler != nil {
-		c.session = server.NewInProcessSessionWithHandlers(c.sessionID, c.samplingHandler, c.elicitationHandler)
+	if c.samplingHandler != nil || c.elicitationHandler != nil || c.rootsHandler != nil {
+		c.session = server.NewInProcessSessionWithHandlers(c.sessionID, c.samplingHandler, c.elicitationHandler, c.rootsHandler)
 		if err := c.server.RegisterSession(ctx, c.session); err != nil {
+			c.startedMu.Lock()
+			c.started = false
+			c.startedMu.Unlock()
 			return fmt.Errorf("failed to register session: %w", err)
 		}
 	}
